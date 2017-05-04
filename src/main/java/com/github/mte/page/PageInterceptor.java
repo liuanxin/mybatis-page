@@ -39,13 +39,17 @@ public class PageInterceptor implements Interceptor {
         DIALECT_MAP.put("mysql", MySqlDialect.class);
         DIALECT_MAP.put("oracle", OracleDialect.class);
     }
-
     private static final int MAPPED_INDEX = 0;
     private static final int PARAM_INDEX = 1;
     private static final int ROW_INDEX = 2;
 
 
     private Class<? extends Dialect> dialect;
+
+    public PageInterceptor() {}
+    public PageInterceptor(String dialect) {
+        setDialect(dialect);
+    }
 
     @SuppressWarnings("unchecked")
     @Override
