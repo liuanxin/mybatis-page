@@ -1,0 +1,8 @@
+
+** mybatis 分页
+
+  基于 mybatis 的分页插件
+
+** 使用
+
+  将 PageInterceptor 装载进 mybatis 的 plugin 即可
