@@ -115,6 +115,39 @@ public class PageUtil {
         return count;
     }
 
+    private static int queryCount(MappedStatement ms, Object param, String sql) throws SQLException {
+        Connection con = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            con = ms.getConfiguration().getEnvironment().getDataSource().getConnection();
+            st = con.prepareStatement(sql);
+            setParameters(ms, param, st);
+
+            rs = st.executeQuery();
+            int count = 0;
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+            return count;
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+            } finally {
+                try {
+                    if (st != null) {
+                        st.close();
+                    }
+                } finally {
+                    if (con != null && !con.isClosed()) {
+                        con.close();
+                    }
+                }
+            }
+        }
+    }
     @SuppressWarnings("unchecked")
     private static void setParameters(final MappedStatement mappedStatement,
                                       final Object parameterObject,
@@ -149,39 +182,6 @@ public class PageUtil {
                     JdbcType jdbcType = parameterMapping.getJdbcType();
                     if (value == null && jdbcType == null) jdbcType = configuration.getJdbcTypeForNull();
                     typeHandler.setParameter(ps, i + 1, value, jdbcType);
-                }
-            }
-        }
-    }
-    private static int queryCount(MappedStatement ms, Object param, String sql) throws SQLException {
-        Connection con = null;
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        try {
-            con = ms.getConfiguration().getEnvironment().getDataSource().getConnection();
-            st = con.prepareStatement(sql);
-            setParameters(ms, param, st);
-
-            rs = st.executeQuery();
-            int count = 0;
-            if (rs.next()) {
-                count = rs.getInt(1);
-            }
-            return count;
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } finally {
-                try {
-                    if (st != null) {
-                        st.close();
-                    }
-                } finally {
-                    if (con != null && !con.isClosed()) {
-                        con.close();
-                    }
                 }
             }
         }
