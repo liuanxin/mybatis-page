@@ -6,8 +6,6 @@ import com.github.mte.page.dialect.impl.OracleDialect;
 import com.github.mte.page.model.Page;
 import com.github.mte.page.model.PageList;
 import com.github.mte.page.util.PageUtil;
-import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -76,7 +74,7 @@ public class PageInterceptor implements Interceptor {
             Object[] constructor_params = new Object[] { ms, param, page };
             dialectInstance = (Dialect) constructor.newInstance(constructor_params);
         } catch (Exception e) {
-            throw new RuntimeException("Cann't instance dialect instance: " + dialect, e);
+            throw new RuntimeException("Cannot instance dialect instance: " + dialect, e);
         }
 
         final BoundSql boundSql = ms.getBoundSql(param);
@@ -86,25 +84,9 @@ public class PageInterceptor implements Interceptor {
             count = PageUtil.submit(new Callable<Integer>() {
                 @Override
                 public Integer call() throws Exception {
-                    Integer count;
-                    Cache cache = ms.getCache();
+                    Executor executor = (Executor) invocation.getTarget();
                     String countSQL = dialectInstance.getCountSQL();
-                    if (cache != null && ms.isUseCache() && ms.getConfiguration().isCacheEnabled()) {
-                        Executor executor = (Executor) invocation.getTarget();
-
-                        List<ParameterMapping> mappings = boundSql.getParameterMappings();
-                        Object parameterObject = boundSql.getParameterObject();
-                        BoundSql sql = PageUtil.copyFromBoundSql(ms, boundSql, countSQL, mappings, parameterObject);
-                        CacheKey cacheKey = executor.createCacheKey(ms, param, page, sql);
-                        count = (Integer) cache.getObject(cacheKey);
-                        if (count == null) {
-                            count = PageUtil.getCount(ms, param, countSQL);
-                            cache.putObject(cacheKey, count);
-                        }
-                    } else {
-                        count = PageUtil.getCount(ms, param, countSQL);
-                    }
-                    return count;
+                    return PageUtil.getCount(executor, ms, param, page, countSQL);
                 }
             });
         }
@@ -132,6 +114,7 @@ public class PageInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
+        setDialect(properties.getProperty("dialect"));
     }
 
 
@@ -143,7 +126,7 @@ public class PageInterceptor implements Interceptor {
         if (clazz == null) {
             throw new RuntimeException("no support db dialect with " + dialect);
         }
-        
+
         this.dialect = clazz;
         return this;
     }

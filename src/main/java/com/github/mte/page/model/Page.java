@@ -33,18 +33,18 @@ public class Page extends RowBounds implements Serializable {
     }
 
 
-    public int getPage() {
-        return page;
-    }
     public void setPage(int page) {
         this.page = page;
     }
-
-    public boolean isQueryTotal() {
-        return queryTotal;
+    public int getPage() {
+        return page;
     }
+
     public void setQueryTotal(boolean queryTotal) {
         this.queryTotal = queryTotal;
+    }
+    public boolean isQueryTotal() {
+        return queryTotal;
     }
 
 
