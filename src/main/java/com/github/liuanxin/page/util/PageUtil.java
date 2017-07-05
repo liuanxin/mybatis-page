@@ -1,6 +1,6 @@
 package com.github.liuanxin.page.util;
 
-import com.github.liuanxin.page.model.Page;
+import com.github.liuanxin.page.model.PageBounds;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.ErrorContext;
@@ -95,7 +95,7 @@ public class PageUtil {
     }
 
     public static int getCount(Executor executor, MappedStatement ms,
-                               Object param, Page page, String sql) throws SQLException {
+                               Object param, PageBounds page, String sql) throws SQLException {
         Integer count;
         Cache cache = ms.getCache();
         if (cache != null && ms.isUseCache() && ms.getConfiguration().isCacheEnabled()) {

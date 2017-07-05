@@ -3,7 +3,7 @@ package com.github.liuanxin.page;
 import com.github.liuanxin.page.dialect.impl.MySqlDialect;
 import com.github.liuanxin.page.dialect.impl.OracleDialect;
 import com.github.liuanxin.page.dialect.Dialect;
-import com.github.liuanxin.page.model.Page;
+import com.github.liuanxin.page.model.PageBounds;
 import com.github.liuanxin.page.model.PageList;
 import com.github.liuanxin.page.util.PageUtil;
 import org.apache.ibatis.executor.Executor;
@@ -58,10 +58,10 @@ public class PageInterceptor implements Interceptor {
 
         Object[] args = invocation.getArgs();
         Object rowBounds = args[ROW_INDEX];
-        if (!(rowBounds instanceof Page)) {
+        if (!(rowBounds instanceof PageBounds)) {
             return invocation.proceed();
         }
-        final Page page = (Page) rowBounds;
+        final PageBounds page = (PageBounds) rowBounds;
         if (page.notNeedPage()) {
             return invocation.proceed();
         }
@@ -70,7 +70,7 @@ public class PageInterceptor implements Interceptor {
         final Object param = args[PARAM_INDEX];
         final Dialect dialectInstance;
         try {
-            Constructor constructor = dialect.getConstructor(MappedStatement.class, Object.class, Page.class);
+            Constructor constructor = dialect.getConstructor(MappedStatement.class, Object.class, PageBounds.class);
             Object[] constructor_params = new Object[] { ms, param, page };
             dialectInstance = (Dialect) constructor.newInstance(constructor_params);
         } catch (Exception e) {

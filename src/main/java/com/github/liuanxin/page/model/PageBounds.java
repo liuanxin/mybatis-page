@@ -4,17 +4,17 @@ import org.apache.ibatis.session.RowBounds;
 
 import java.io.Serializable;
 
-public class Page extends RowBounds implements Serializable {
+public class PageBounds extends RowBounds implements Serializable {
 
     private int page = 1;
     private int limit = 15;
     private boolean queryTotal = false;
 
-    public Page() {}
-    public Page(int limit) {
+    public PageBounds() {}
+    public PageBounds(int limit) {
         this.limit = limit;
     }
-    public Page(int page, int limit) {
+    public PageBounds(int page, int limit) {
         this.page = page;
         this.limit = limit;
         queryTotal = true;
