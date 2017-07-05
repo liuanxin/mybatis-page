@@ -1,11 +1,11 @@
-package com.github.mte.page;
+package com.github.liuanxin.page;
 
-import com.github.mte.page.dialect.Dialect;
-import com.github.mte.page.dialect.impl.MySqlDialect;
-import com.github.mte.page.dialect.impl.OracleDialect;
-import com.github.mte.page.model.Page;
-import com.github.mte.page.model.PageList;
-import com.github.mte.page.util.PageUtil;
+import com.github.liuanxin.page.dialect.impl.MySqlDialect;
+import com.github.liuanxin.page.dialect.impl.OracleDialect;
+import com.github.liuanxin.page.dialect.Dialect;
+import com.github.liuanxin.page.model.Page;
+import com.github.liuanxin.page.model.PageList;
+import com.github.liuanxin.page.util.PageUtil;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;

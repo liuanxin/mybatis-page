@@ -1,4 +1,4 @@
-package com.github.mte.page.model;
+package com.github.liuanxin.page.model;
 
 import org.apache.ibatis.session.RowBounds;
 

@@ -1,7 +1,7 @@
-package com.github.mte.page.dialect.impl;
+package com.github.liuanxin.page.dialect.impl;
 
-import com.github.mte.page.dialect.Dialect;
-import com.github.mte.page.model.Page;
+import com.github.liuanxin.page.dialect.Dialect;
+import com.github.liuanxin.page.model.Page;
 import org.apache.ibatis.mapping.MappedStatement;
 
 public class MySqlDialect extends Dialect {

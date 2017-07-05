@@ -1,6 +1,6 @@
-package com.github.mte.page.dialect;
+package com.github.liuanxin.page.dialect;
 
-import com.github.mte.page.model.Page;
+import com.github.liuanxin.page.model.Page;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;

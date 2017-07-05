@@ -1,6 +1,6 @@
-package com.github.mte.page.util;
+package com.github.liuanxin.page.util;
 
-import com.github.mte.page.model.Page;
+import com.github.liuanxin.page.model.Page;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.ErrorContext;

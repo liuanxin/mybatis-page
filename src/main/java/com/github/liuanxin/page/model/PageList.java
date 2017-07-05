@@ -1,4 +1,4 @@
-package com.github.mte.page.model;
+package com.github.liuanxin.page.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
