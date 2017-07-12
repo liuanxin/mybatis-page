@@ -25,7 +25,11 @@ public class PageBounds extends RowBounds implements Serializable {
         return getOffset() == RowBounds.NO_ROW_OFFSET && limit == RowBounds.NO_ROW_LIMIT;
     }
 
-    /** If count = 10, limit = 15, But incoming param page value was 2, It's wrong, Can only be 1 */
+    /**
+     * If count = 10, limit = 15, But incoming param page value was 2, It's wrong, Can only be 1
+     *
+     * @param count select count(1)
+     */
     public void pageWrong(Integer count) {
         if (count != null && count > 0 && count <= limit && page > 1) {
             page = 1;
