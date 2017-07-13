@@ -13,14 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** 将 PageList 渲染成 json, 使用 Jackson 序列化 */
-public class PageListToJson extends ObjectMapper {
+public class PageListToJsonMapper extends ObjectMapper {
 
     /**
      * 将数据返回时, 只输出 总条数 和 当前页的数据.<br/>
      *
      * 前端根据 page limit(此两个值由他们传入) 和 总条数 三个值, 输出相关的 1 2 3 及置灰相关的按钮等
      */
-    public PageListToJson() {
+    public PageListToJsonMapper() {
         super();
 
         registerModule(new SimpleModule().addSerializer(PageList.class, new JsonSerializer<PageList>() {

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** 将 PageList 渲染成 model, 放入 spring mvc 的渲染上下文中, 使用拦截器实现 */
-public class PageListToPage implements HandlerInterceptor {
+public class PageListToPageInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -28,7 +28,7 @@ public class PageListToPage implements HandlerInterceptor {
             for (Map.Entry<String, Object> item : modelAndView.getModel().entrySet()) {
                 Object value = item.getValue();
                 if (value instanceof PageList) {
-                    newModel.put(item.getKey() + "-count", ((PageList) value).getCount());
+                    newModel.put(item.getKey() + "Total", ((PageList) value).getCount());
                 }
             }
             if (!newModel.isEmpty()) {
@@ -43,7 +43,7 @@ public class PageListToPage implements HandlerInterceptor {
                 String name = (String) element;
                 Object attribute = request.getAttribute(name);
                 if (attribute instanceof PageList) {
-                    request.setAttribute(name + "-count", ((PageList) attribute).getCount());
+                    request.setAttribute(name + "Total", ((PageList) attribute).getCount());
                 }
             }
         }
