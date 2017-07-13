@@ -16,7 +16,7 @@ import java.util.Map;
 public class PageListToJsonMapper extends ObjectMapper {
 
     /**
-     * 将数据返回时, 只输出 总条数 和 当前页的数据.<br/>
+     * 将数据返回时, 只输出 总条数 和 当前页的数据.
      *
      * 前端根据 page limit(此两个值由他们传入) 和 总条数 三个值, 输出相关的 1 2 3 及置灰相关的按钮等
      */
