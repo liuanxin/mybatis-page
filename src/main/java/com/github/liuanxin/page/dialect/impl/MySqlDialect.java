@@ -14,7 +14,7 @@ public class MySqlDialect extends Dialect {
     protected String getLimitString(String sql, String offsetName, int offset, String limitName, int limit) {
         sql = sql.trim();
         boolean hasForUpdate = false;
-        if (sql.toLowerCase().endsWith(FOR_UPDATE)) {
+        if (sql.toUpperCase().endsWith(FOR_UPDATE)) {
             sql = sql.substring(0, sql.length() - FOR_UPDATE.length());
             hasForUpdate = true;
         }
