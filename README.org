@@ -1,8 +1,141 @@
 
-** mybatis 分页
+** 分页
 
   基于 mybatis 的分页插件
 
 ** 使用
 
-  将 PageInterceptor 装载进 mybatis 的 plugin 即可
+添加引用
+#+BEGIN_SRC xml
+<dependency>
+    <groupId>com.github.liuanxin</groupId>
+    <artifactId>mybatis-page</artifactId>
+    <version>1.0.0</version>
+</dependency>
+#+END_SRC
+
+将插件写进 mybatis 的上下文
+#+BEGIN_SRC java
+@Bean
+public SqlSessionFactory sqlSessionFactory() throws Exception {
+    SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+    sessionFactory.setDataSource(datasource());
+    
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("mysql") });
+    // sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor().setDialect("mysql") }); // or
+
+    // load xml & handler
+    sessionFactory.setMapperLocations(...);
+    sessionFactory.setTypeHandlers(...);
+    return sessionFactory.getObject();
+}
+#+END_SRC
+
+或者写进 mybatis-config.xml
+#+BEGIN_SRC xml
+<plugins>
+  <plugin interceptor="com.github.liuanxin.page.PageInterceptor">
+    <property name="dialect" value="mysql"/>
+  </plugin>
+</plugins>
+#+END_SRC
+
+你的 xml 应该是像下面这样
+#+BEGIN_SRC xml
+<resultMap id="BaseResultMap" type="com.xxx.model.User">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+</resultMap>
+<select id="selectByExample" parameterType="com.xxx.model.UserExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+        distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from `t_user`
+    <if test="_parameter != null">
+        <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+        order by ${orderByClause}
+    </if>
+</select>
+#+END_SRC
+
+你的 UserMapper.java 文件应该有像下面这样的一个方法
+#+BEGIN_SRC java
+List<User> selectByExample(UserExample example);
+#+END_SRC
+
+此时可以添加一个新方法到 UserMapper.java 中, 而后使用此方法查询数据库时将会发起分页操作
+#+BEGIN_SRC java
+List<User> selectByExample(UserExample example, com.github.liuanxin.page.model.PageBounds page);
+#+END_SRC
+
+分页插件会自动根据当前查询中有 page 参数而去向数据库发起 select count 查询, 且会自动根据当前数据库方言添加 limit rownum 等(目前只支持 mysql 和 oracle).
+
+
+** 返回数据
+
++ json
+
+我们的 controller 通常会这样写
+#+BEGIN_SRC java
+@GetMapping("/user")
+@ResponseBody
+public JsonResult<List<User>> user(PageBounds page) {
+    return JsonResult.success("user list", userService.getUserLiset(page));
+}
+#+END_SRC
+正常情况下它的返回会是
+#+BEGIN_SRC json
+{
+  "code": 1,
+  "msg": "user list",
+  "data": [
+    {
+      "id":1,"name":"Tom"
+    },{
+      "id":2,"name":"Jerry"
+    }
+  ]
+}
+#+END_SRC
+
+将 spring mvc 默认的 ObjectMapping 替换成 PageListToJsonMapper, 不改变任何代码的前提下, 输出会是下面这样
+
+#+BEGIN_SRC json
+{
+  "code": 1,
+  "msg": "user list",
+  "data": {
+    "total": 100,
+    "items": [
+      {
+        "id":1,"name":"Tom"
+      },{
+        "id":2,"name":"Jerry"
+      }
+    ]
+  }
+}
+#+END_SRC
+
+调用方根据它在调用前的 page 和 limit 以及返回的 total 值输出 相关的 1 2 3 及置灰相关的按钮
+
++ 页面
+
+如 controller 一般是这样
+#+BEGIN_SRC java
+@GetMapping("/user")
+public String user(PageBounds page, Model model) {
+    model.addAttribute("userList", userService.getUserLiset(page));
+    return "user";
+}
+#+END_SRC
+
+将 PageListToPageInterceptor 放入 spring mvc 的上下文拦截器中.
+
+这样到了 user 页面的时候, 上下文中会有 *userListTotal* 这个值,
+页面根据调用前的 page 和 limit 以及具体的 *userListTotal* 值输出 相关的 1 2 3 及置灰相关的按钮.

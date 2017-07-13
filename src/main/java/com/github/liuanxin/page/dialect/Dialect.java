@@ -13,6 +13,7 @@ import java.util.Map;
 public class Dialect {
 
     protected static final String FOR_UPDATE = " FOR UPDATE";
+    protected static final String ORDER_BY = " ORDER BY ";
 
     protected MappedStatement ms;
     protected PageBounds page;
@@ -70,7 +71,15 @@ public class Dialect {
         }
     }
     public String getCountSQL() {
-        return "SELECT COUNT(1) FROM (" + sql + ") TMP_COUNT";
+        String countSql = sql;
+        String upperCase = countSql.toUpperCase();
+        if (upperCase.endsWith(FOR_UPDATE)) {
+            countSql = countSql.substring(0, countSql.length() - FOR_UPDATE.length());
+        }
+        if (upperCase.contains(ORDER_BY)) {
+            countSql = countSql.substring(0, upperCase.indexOf(ORDER_BY));
+        }
+        return "SELECT COUNT(1) FROM (" + countSql + ") TEMP_COUNT";
     }
 
     protected String getLimitString(String sql, String offsetName, int offset, String limitName, int limit) {

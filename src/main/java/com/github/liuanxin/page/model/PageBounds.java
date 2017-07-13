@@ -8,7 +8,10 @@ public class PageBounds extends RowBounds implements Serializable {
 
     private int page = 1;
     private int limit = 15;
+    /** 在 app 中(Android, iOS ...)是不需要查询总条数的 */
     private boolean queryTotal = false;
+    /** 如果总条数是 10, 每页 15 条, 如果此时传进来的 page 是 2, 那这是错的, 只能是 1 */
+    private boolean checkPage = false;
 
     public PageBounds() {}
     public PageBounds(int limit) {
@@ -18,6 +21,17 @@ public class PageBounds extends RowBounds implements Serializable {
         this.page = page;
         this.limit = limit;
         queryTotal = true;
+    }
+
+    public PageBounds(int limit, boolean checkPage) {
+        this.limit = limit;
+        this.checkPage = checkPage;
+    }
+    public PageBounds(int page, int limit, boolean checkPage) {
+        this.page = page;
+        this.limit = limit;
+        queryTotal = true;
+        this.checkPage = checkPage;
     }
 
 
@@ -31,39 +45,37 @@ public class PageBounds extends RowBounds implements Serializable {
      * @param count select count(1)
      */
     public void pageWrong(Integer count) {
-        if (count != null && count > 0 && count <= limit && page > 1) {
+        if (checkPage && count != null && count > 0 && count <= limit && page > 1) {
             page = 1;
         }
     }
 
 
-    public void setPage(int page) {
+    public PageBounds setPage(int page) {
         this.page = page;
+        return this;
     }
-    public int getPage() {
-        return page;
-    }
+    public int getPage() { return page; }
 
-    public void setQueryTotal(boolean queryTotal) {
+    public PageBounds setQueryTotal(boolean queryTotal) {
         this.queryTotal = queryTotal;
+        return this;
     }
-    public boolean isQueryTotal() {
-        return queryTotal;
-    }
+    public boolean isQueryTotal() { return queryTotal; }
 
-
-    public void setLimit(int limit) {
-        this.limit = limit;
+    public PageBounds setCheckPage(boolean checkPage) {
+        this.checkPage = checkPage;
+        return this;
     }
+    public boolean isCheckPage() { return checkPage; }
+
+    public void setLimit(int limit) { this.limit = limit; }
     @Override
-    public int getLimit() {
-        return limit;
-    }
+    public int getLimit() { return limit; }
 
     @Override
-    public int getOffset() {
-        return (page > 0) ? ((page - 1) * limit) : 0;
-    }
+    public int getOffset() { return (page > 0) ? ((page - 1) * limit) : 0; }
+
     @Override
     public String toString() {
         return String.format("(page: %s, limit: %s, queryTotal: %s)", page, limit, queryTotal);
