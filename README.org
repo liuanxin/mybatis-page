@@ -68,7 +68,7 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 List<User> selectByExample(UserExample example);
 #+END_SRC
 
-此时可以添加一个新方法到 UserMapper.java 中, 而后使用此方法查询数据库时将会发起分页操作
+此时可以添加一个新方法到 UserMapper.java 中, 而后使用此方法查询数据库时将会发起分页操作.
 #+BEGIN_SRC java
 List<User> selectByExample(UserExample example, com.github.liuanxin.page.model.PageBounds page);
 #+END_SRC
