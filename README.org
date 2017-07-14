@@ -45,7 +45,7 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 <resultMap id="BaseResultMap" type="com.xxx.model.User">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
-    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="pass_word" jdbcType="VARCHAR" property="password" />
 </resultMap>
 <select id="selectByExample" parameterType="com.xxx.model.UserExample" resultMap="BaseResultMap">
     select
