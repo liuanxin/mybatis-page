@@ -13,6 +13,8 @@ import java.util.Map;
 /** 将 PageList 渲染成 model, 放入 spring mvc 的渲染上下文中, 使用拦截器实现 */
 public class PageListToPageInterceptor implements HandlerInterceptor {
 
+    private static final String SUFFIX = "Total";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object handler) throws Exception {
@@ -23,14 +25,13 @@ public class PageListToPageInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response,
                            Object handler, ModelAndView modelAndView) throws Exception {
-        String suffix = "Total";
         
         if (modelAndView != null) {
             Map<String, Object> newModel = new HashMap<String, Object>();
             for (Map.Entry<String, Object> item : modelAndView.getModel().entrySet()) {
                 Object value = item.getValue();
                 if (value instanceof PageList) {
-                    newModel.put(item.getKey() + suffix, ((PageList) value).getCount());
+                    newModel.put(item.getKey() + SUFFIX, ((PageList) value).getCount());
                 }
             }
             if (!newModel.isEmpty()) {
@@ -45,7 +46,7 @@ public class PageListToPageInterceptor implements HandlerInterceptor {
                 String name = (String) element;
                 Object attribute = request.getAttribute(name);
                 if (attribute instanceof PageList) {
-                    request.setAttribute(name + suffix, ((PageList) attribute).getCount());
+                    request.setAttribute(name + SUFFIX, ((PageList) attribute).getCount());
                 }
             }
         }
