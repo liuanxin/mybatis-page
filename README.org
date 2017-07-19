@@ -40,13 +40,14 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 </plugins>
 #+END_SRC
 
-你的 xml 应该是像下面这样
+实现类的 xml 应该是像下面这样
 #+BEGIN_SRC xml
 <resultMap id="BaseResultMap" type="com.xxx.model.User">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
     <result column="pass_word" jdbcType="VARCHAR" property="password" />
 </resultMap>
+
 <select id="selectByExample" parameterType="com.xxx.model.UserExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -63,24 +64,24 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 </select>
 #+END_SRC
 
-你的 UserMapper.java 文件应该有像下面这样的一个方法
+接口类 UserMapper.java 文件有像下面这样的一个方法
 #+BEGIN_SRC java
 List<User> selectByExample(UserExample example);
 #+END_SRC
 
-此时可以添加一个新方法到 UserMapper.java 中, 而后使用此方法查询数据库时将会发起分页操作.
+此时可以添加一个新方法到 UserMapper.java 中(实现都是基于上面的 xml), 而后使用此方法查询数据库时将会发起分页操作.
 #+BEGIN_SRC java
 List<User> selectByExample(UserExample example, com.github.liuanxin.page.model.PageBounds page);
 #+END_SRC
 
-分页插件会自动根据当前查询中有 page 参数而去向数据库发起 select count 查询, 且会自动根据当前数据库方言添加 limit rownum 等(目前只支持 mysql 和 oracle).
+分页插件会根据当前数据库方言添加 limit rownum 等(目前只支持 mysql 和 oracle).
 
 
 ** 返回数据
 
 + json
 
-我们的 controller 通常会这样写
+控制层的 controller 通常会这样写
 #+BEGIN_SRC java
 @GetMapping("/user")
 @ResponseBody
@@ -88,7 +89,8 @@ public JsonResult<List<User>> user(PageBounds page) {
     return JsonResult.success("user list", userService.getUserLiset(page));
 }
 #+END_SRC
-正常情况下它的返回会是
+
+返回会是下面这样
 #+BEGIN_SRC json
 {
   "code": 1,
@@ -103,7 +105,7 @@ public JsonResult<List<User>> user(PageBounds page) {
 }
 #+END_SRC
 
-将 spring mvc 默认的 ObjectMapping 替换成 PageListToJsonMapper, 不改变任何代码的前提下, 输出会是下面这样
+此时, 将 spring mvc 默认的 ObjectMapping 替换成 PageListToJsonMapper, 不改变任何代码的前提下, 输出会是下面这样
 
 #+BEGIN_SRC json
 {
@@ -122,11 +124,11 @@ public JsonResult<List<User>> user(PageBounds page) {
 }
 #+END_SRC
 
-调用方根据它在调用前的 page 和 limit 以及返回的 total 值输出 相关的 1 2 3 及置灰相关的按钮
+调用方再根据请求接口前的 page 和 limit 参数以及返回的 total 值输出 相关的 1 2 3 及置灰相关的按钮
 
 + 页面
 
-如 controller 一般是这样
+如果返回页面, controller 一般是这样
 #+BEGIN_SRC java
 @GetMapping("/user")
 public String user(PageBounds page, Model model) {
@@ -135,7 +137,13 @@ public String user(PageBounds page, Model model) {
 }
 #+END_SRC
 
-将 PageListToPageInterceptor 放入 spring mvc 的上下文拦截器中.
+将 PageListToPageInterceptor 放入 spring mvc 的拦截器中.
+#+BEGIN_SRC java
+@Override
+public void addInterceptors(InterceptorRegistry registry) {
+    // ...
+    registry.addInterceptor(new PageListToPageInterceptor()).addPathPatterns("/**");
+}
+#+END_SRC
 
-这样到了 user 页面的时候, 上下文中会有 *userListTotal* 这个值,
-页面根据调用前的 page 和 limit 以及具体的 *userListTotal* 值输出 相关的 1 2 3 及置灰相关的按钮.
+这样到了 user 页面的时候, 上下文中将会有 *userListTotal* 这个值, 页面根据请求调用前的 page 和 limit 以及具体的 *userListTotal* 值输出 相关的 1 2 3 及置灰相关的按钮.
