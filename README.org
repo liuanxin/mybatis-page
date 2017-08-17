@@ -105,7 +105,20 @@ public JsonResult<List<User>> user(PageBounds page) {
 }
 #+END_SRC
 
-此时, 将 spring mvc 默认的 ObjectMapping 替换成 PageListToJsonMapper, 不改变任何代码的前提下, 输出会是下面这样
+此时, 将 spring mvc 默认的 ObjectMapping 替换成 PageListToJsonMapper
+
+#+BEGIN_SRC java
+@Override
+public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+    for (HttpMessageConverter<?> converter : converters) {
+        if (converter instanceof MappingJackson2HttpMessageConverter) {
+            ((MappingJackson2HttpMessageConverter) converter).setObjectMapper(new PageListToJsonMapper());
+        }
+    }
+}
+#+END_SRC
+
+以后的输出会是下面这样(这样对于 controller service 是完全透明的)
 
 #+BEGIN_SRC json
 {
