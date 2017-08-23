@@ -29,7 +29,7 @@ public class PageListToJsonMapper extends ObjectMapper {
             public void serialize(PageList value, JsonGenerator gen, SerializerProvider sp) throws IOException {
                 Map<String, Object> returnMap = new HashMap<String, Object>();
                 returnMap.put("items", new ArrayList(value));
-                returnMap.put("total", value.getCount());
+                returnMap.put("total", value.getTotal());
 
                 gen.writeObject(returnMap);
             }

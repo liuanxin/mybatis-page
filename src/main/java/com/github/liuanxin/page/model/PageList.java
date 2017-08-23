@@ -5,20 +5,20 @@ import java.util.Collection;
 
 public class PageList<E> extends ArrayList<E> {
 
-    private int count;
+    private int total;
 
     public PageList() {
         super();
     }
     public PageList(Collection<? extends E> c, int total) {
         super(c);
-        this.count = total;
+        this.total = total;
     }
 
-    public int getCount() {
-        return count;
+    public int getTotal() {
+        return total;
     }
-    public void setCount(int count) {
-        this.count = count;
+    public void setTotal(int total) {
+        this.total = total;
     }
 }

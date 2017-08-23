@@ -30,8 +30,8 @@ public class PageBounds extends RowBounds implements Serializable {
     public PageBounds(int page, int limit, boolean checkPage) {
         this.page = page;
         this.limit = limit;
-        queryTotal = true;
         this.checkPage = checkPage;
+        queryTotal = true;
     }
 
 
@@ -51,21 +51,18 @@ public class PageBounds extends RowBounds implements Serializable {
     }
 
 
-    public PageBounds setPage(int page) {
+    public void setPage(int page) {
         this.page = page;
-        return this;
     }
     public int getPage() { return page; }
 
-    public PageBounds setQueryTotal(boolean queryTotal) {
+    public void setQueryTotal(boolean queryTotal) {
         this.queryTotal = queryTotal;
-        return this;
     }
     public boolean isQueryTotal() { return queryTotal; }
 
-    public PageBounds setCheckPage(boolean checkPage) {
+    public void setCheckPage(boolean checkPage) {
         this.checkPage = checkPage;
-        return this;
     }
     public boolean isCheckPage() { return checkPage; }
 
@@ -78,6 +75,7 @@ public class PageBounds extends RowBounds implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("(page: %s, limit: %s, queryTotal: %s)", page, limit, queryTotal);
+        return String.format("(page: %s, limit: %s, queryTotal: %s, checkPage: %s)",
+                page, limit, queryTotal, checkPage);
     }
 }
