@@ -31,7 +31,7 @@ public class PageListToPageInterceptor implements HandlerInterceptor {
             for (Map.Entry<String, Object> item : modelAndView.getModel().entrySet()) {
                 Object value = item.getValue();
                 if (value instanceof PageList) {
-                    newModel.put(item.getKey() + SUFFIX, ((PageList) value).getCount());
+                    newModel.put(item.getKey() + SUFFIX, ((PageList) value).getTotal());
                 }
             }
             if (!newModel.isEmpty()) {
@@ -46,7 +46,7 @@ public class PageListToPageInterceptor implements HandlerInterceptor {
                 String name = (String) element;
                 Object attribute = request.getAttribute(name);
                 if (attribute instanceof PageList) {
-                    request.setAttribute(name + SUFFIX, ((PageList) attribute).getCount());
+                    request.setAttribute(name + SUFFIX, ((PageList) attribute).getTotal());
                 }
             }
         }
