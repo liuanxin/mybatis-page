@@ -89,6 +89,9 @@ public class PageInterceptor implements Interceptor {
                     return PageUtil.getCount(executor, ms, param, page, countSQL);
                 }
             });
+            if (count == 0) {
+                return new PageList(null, 0);
+            }
         }
 
         List<ParameterMapping> mappings = dialectInstance.getParameterMappings();
