@@ -1,8 +1,7 @@
 package com.github.liuanxin.page;
 
-import com.github.liuanxin.page.dialect.impl.MySqlDialect;
-import com.github.liuanxin.page.dialect.impl.OracleDialect;
 import com.github.liuanxin.page.dialect.Dialect;
+import com.github.liuanxin.page.dialect.DialectUtil;
 import com.github.liuanxin.page.model.PageBounds;
 import com.github.liuanxin.page.model.PageList;
 import com.github.liuanxin.page.util.PageUtil;
@@ -15,14 +14,14 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
 /**
  * {@link Executor#query(MappedStatement, Object, RowBounds, ResultHandler)}
+ *
+ * @author https://github.com/liuanxin
  */
 @Intercepts({
         @Signature(
@@ -32,15 +31,9 @@ import java.util.concurrent.Callable;
 })
 public class PageInterceptor implements Interceptor {
 
-    private static final Map<String, Class<? extends Dialect>> DIALECT_MAP = new HashMap<String, Class<? extends Dialect>>();
-    static {
-        DIALECT_MAP.put("mysql", MySqlDialect.class);
-        DIALECT_MAP.put("oracle", OracleDialect.class);
-    }
     private static final int MAPPED_INDEX = 0;
     private static final int PARAM_INDEX = 1;
     private static final int ROW_INDEX = 2;
-
 
     private Class<? extends Dialect> dialect;
 
@@ -71,8 +64,8 @@ public class PageInterceptor implements Interceptor {
         final Dialect dialectInstance;
         try {
             Constructor constructor = dialect.getConstructor(MappedStatement.class, Object.class, PageBounds.class);
-            Object[] constructor_params = new Object[] { ms, param, page };
-            dialectInstance = (Dialect) constructor.newInstance(constructor_params);
+            Object[] constructorParams = new Object[] { ms, param, page };
+            dialectInstance = (Dialect) constructor.newInstance(constructorParams);
         } catch (Exception e) {
             throw new RuntimeException("Cannot instance dialect instance: " + dialect, e);
         }
@@ -81,16 +74,13 @@ public class PageInterceptor implements Interceptor {
 
         Integer count = null;
         if (page.isQueryTotal()) {
-            count = PageUtil.submit(new Callable<Integer>() {
-                @Override
-                public Integer call() throws Exception {
-                    Executor executor = (Executor) invocation.getTarget();
-                    String countSQL = dialectInstance.getCountSQL();
-                    return PageUtil.getCount(executor, ms, param, page, countSQL);
-                }
-            });
+            Executor executor = (Executor) invocation.getTarget();
+            String countSQL = dialectInstance.getCountSQL();
+            count = PageUtil.getCount(executor, ms, param, page, countSQL);
+
+            // if count was 0, don't need to query page data
             if (count == 0) {
-                return new PageList(null, 0);
+                return new PageList(Collections.emptyList(), 0);
             }
         }
 
@@ -102,12 +92,11 @@ public class PageInterceptor implements Interceptor {
         args[PARAM_INDEX] = parameterObject;
         args[ROW_INDEX] = RowBounds.DEFAULT;
 
-        List list = PageUtil.submit(new Callable<List>() {
-            public List call() throws Exception {
-                return (List) invocation.proceed();
-            }
-        });
-        return (count != null && count >= 0) ? new PageList(list, count) : list;
+        List list = (List) invocation.proceed();
+
+        return (count != null && count > 0)
+                ? new PageList((list == null || list.size() == 0 ? Collections.emptyList() : list), count)
+                : list;
     }
 
     @Override
@@ -125,11 +114,11 @@ public class PageInterceptor implements Interceptor {
         if (dialect == null || "".equals(dialect.trim())) {
             throw new RuntimeException("must set dialect");
         }
-        Class<? extends Dialect> clazz = DIALECT_MAP.get(dialect.toLowerCase());
+
+        Class<? extends Dialect> clazz = DialectUtil.getDialect(dialect);
         if (clazz == null) {
             throw new RuntimeException("no support db dialect with " + dialect);
         }
-
         this.dialect = clazz;
         return this;
     }

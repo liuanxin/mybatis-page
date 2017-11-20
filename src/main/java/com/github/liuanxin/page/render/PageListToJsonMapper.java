@@ -12,7 +12,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/** 将 PageList 渲染成 json, 使用 Jackson 序列化 */
+/**
+ * 将 PageList 渲染成 json, 使用 Jackson 序列化
+ *
+ * @author https://github.com/liuanxin
+ */
 public class PageListToJsonMapper extends ObjectMapper {
 
     /**

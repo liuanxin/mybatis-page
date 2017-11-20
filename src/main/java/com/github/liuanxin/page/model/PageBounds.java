@@ -4,6 +4,9 @@ import org.apache.ibatis.session.RowBounds;
 
 import java.io.Serializable;
 
+/**
+ * @author https://github.com/liuanxin
+ */
 public class PageBounds extends RowBounds implements Serializable {
 
     private int page = 1;

@@ -3,6 +3,9 @@ package com.github.liuanxin.page.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * @author https://github.com/liuanxin
+ */
 public class PageList<E> extends ArrayList<E> {
 
     private int total;
@@ -10,8 +13,8 @@ public class PageList<E> extends ArrayList<E> {
     public PageList() {
         super();
     }
-    public PageList(Collection<? extends E> c, int total) {
-        super(c);
+    public PageList(Collection<? extends E> collection, int total) {
+        super(collection);
         this.total = total;
     }
 

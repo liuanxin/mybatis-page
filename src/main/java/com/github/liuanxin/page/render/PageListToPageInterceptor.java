@@ -10,7 +10,11 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-/** 将 PageList 渲染成 model, 放入 spring mvc 的渲染上下文中, 使用拦截器实现 */
+/**
+ * 将 PageList 渲染成 model, 放入 spring mvc 的渲染上下文中, 使用拦截器实现
+ *
+ * @author https://github.com/liuanxin
+ */
 public class PageListToPageInterceptor implements HandlerInterceptor {
 
     private static final String SUFFIX = "Total";
@@ -25,7 +29,6 @@ public class PageListToPageInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response,
                            Object handler, ModelAndView modelAndView) throws Exception {
-        
         if (modelAndView != null) {
             Map<String, Object> newModel = new HashMap<String, Object>();
             for (Map.Entry<String, Object> item : modelAndView.getModel().entrySet()) {

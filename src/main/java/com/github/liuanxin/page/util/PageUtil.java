@@ -18,26 +18,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
+/**
+ * @author https://github.com/liuanxin
+ */
 public class PageUtil {
-
-    private static final int CPU_NUM = Runtime.getRuntime().availableProcessors();
-    private static final ExecutorService POOL = Executors.newFixedThreadPool(CPU_NUM);
-
-    public static <T> T submit(Callable<T> callable) throws ExecutionException, InterruptedException {
-        return POOL.submit(callable).get();
-    }
-    public static void clear() {
-        POOL.shutdown();
-    }
 
     public static class BoundSqlSqlSource implements SqlSource {
         private BoundSql boundSql;
-        public BoundSqlSqlSource(BoundSql boundSql) {
+        BoundSqlSqlSource(BoundSql boundSql) {
             this.boundSql = boundSql;
         }
 
@@ -82,8 +71,8 @@ public class PageUtil {
         return builder.build();
     }
 
-    public static BoundSql copyFromBoundSql(MappedStatement ms, BoundSql boundSql,
-                                            String sql, List<ParameterMapping> parameterMappings, Object parameter) {
+    private static BoundSql copyFromBoundSql(MappedStatement ms, BoundSql boundSql,
+                                             String sql, List<ParameterMapping> parameterMappings, Object parameter) {
         BoundSql newBoundSql = new BoundSql(ms.getConfiguration(), sql, parameterMappings, parameter);
         for (ParameterMapping mapping : boundSql.getParameterMappings()) {
             String prop = mapping.getProperty();
@@ -180,7 +169,9 @@ public class PageUtil {
                                 propertyName, mappedStatement.getId()));
                     }
                     JdbcType jdbcType = parameterMapping.getJdbcType();
-                    if (value == null && jdbcType == null) jdbcType = configuration.getJdbcTypeForNull();
+                    if (value == null && jdbcType == null) {
+                        jdbcType = configuration.getJdbcTypeForNull();
+                    }
                     typeHandler.setParameter(ps, i + 1, value, jdbcType);
                 }
             }
