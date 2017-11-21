@@ -13,6 +13,7 @@ class SqlServerUtil {
     private static final int DISTINCT_LEN = SELECT_DISTINCT.length();
 
     private static final String ORDER_BY = "ORDER BY ";
+    private static final String DEFAULT_ORDER_BY = " ORDER BY 1 ";
 
     /** 主要针对于 sql server 2000 或 只查询头几条数据的 sql 语句, 这是最简单的处理方式(select top xxx) */
     static String topPage(String sql, int limit) {
@@ -25,6 +26,9 @@ class SqlServerUtil {
     }
 
     /*
+
+    2005 开始使用 row_number() 函数来分页
+
     with paged as (
       select top :offset + :limit row_number() over(order by ...) as rn_,
       xxx from xxx       -- 不带 select 和 order by xx 的原始 sql
@@ -39,7 +43,7 @@ class SqlServerUtil {
     ) a_ where rn_ > :offset and rn_ <= :offset + :limit
 
 
-    下面的方式只支持 sql server 2012
+    单从使用上来说, row_number() 是最为复杂的版本. 下面的方式只支持 sql server 2012
 
     select xxx from xxx order by xx   -- 原始 sql
     offset :offset rows
@@ -48,16 +52,16 @@ class SqlServerUtil {
 
     /** 只在 2012 的版本开始才有效 */
     static String fetchNext(String sql, int offset, int limit) {
-        StringBuilder sb = new StringBuilder(50 + sql.length());
-        sb.append(sql);
+        StringBuilder sbd = new StringBuilder(50 + sql.length());
+        sbd.append(sql).append(" ");
         if (!sql.toUpperCase().contains(ORDER_BY)) {
-            sb.append(ORDER_BY + " 1 ");
+            sbd.append(DEFAULT_ORDER_BY);
         }
-        sb.append(" OFFSET ").append(offset).append(" ROWS");
+        sbd.append(" OFFSET ").append(offset).append(" ROWS");
         if (limit > 0) {
-            sb.append(" FETCH NEXT ").append(limit).append(" ROWS ONLY");
+            sbd.append(" FETCH NEXT ").append(limit).append(" ROWS ONLY");
         }
-        return sb.toString();
+        return sbd.toString();
     }
 
     /** 主要针对 2005 及 2008 支持 row_number 函数的版本 */
@@ -68,7 +72,7 @@ class SqlServerUtil {
         if (hasDistinct(sql)) {
             sbd.append(DISTINCT);
         }
-        /* sbd.append(" top ").append(offset + limit); * /
+        sbd.append(" top ").append(offset + limit);
         sbd.append(" row_number() over (").append(orderBy(sql)).append(" rn_, ").append(noSelectNoOrderSql(sql));
         sbd.append(" ) select * from paged");
         sbd.append(" where rn_ > ").append(offset).append(" and rn_ <= ").append(offset + limit);
@@ -78,7 +82,7 @@ class SqlServerUtil {
         if (hasDistinct(sql)) {
             sbd.append(DISTINCT);
         }
-        /* sbd.append(" top ").append(offset + limit); */
+        sbd.append(" top ").append(offset + limit);
         sbd.append(" row_number() over (").append(orderBy(sql)).append(" rn_, ").append(noSelectNoOrderSql(sql));
         sbd.append(" ) a_ where rn_ > ").append(offset).append(" and rn_ <= ").append(offset + limit);
 
@@ -90,7 +94,7 @@ class SqlServerUtil {
     /** 排序字段, 如果语句中没有使用时间 */
     private static String orderBy(String sql) {
         int orderByIndex = sql.toUpperCase().indexOf(ORDER_BY);
-        return orderByIndex > 0 ? sql.substring(orderByIndex) : ORDER_BY + " CURRENT_TIMESTAMP";
+        return orderByIndex > 0 ? sql.substring(orderByIndex) : DEFAULT_ORDER_BY;
     }
     /** 不带 select 和 order by xx 的原始 sql */
     private static String noSelectNoOrderSql(String sql) {
