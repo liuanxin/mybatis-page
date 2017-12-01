@@ -2,9 +2,14 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <plugins>
+        <plugin interceptor="com.github.liuanxin.page.PageInterceptor"/>
+        <!--
+        if use sql server 2012, not set will use sql server 2005 dialect, please set with sqlserver2012
+        see : com.github.liuanxin.page.dialect.DialectUtil
         <plugin interceptor="com.github.liuanxin.page.PageInterceptor">
             <property name="dialect" value="mysql"/>
         </plugin>
+        -->
     </plugins>
 
     <environments default="development">

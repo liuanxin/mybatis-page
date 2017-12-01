@@ -2,15 +2,14 @@ package com.github.liuanxin.page.dialect.impl;
 
 import com.github.liuanxin.page.dialect.Dialect;
 import com.github.liuanxin.page.model.PageBounds;
-import org.apache.ibatis.mapping.MappedStatement;
 
 /**
  * @author https://github.com/liuanxin
  */
 public class MySqlDialect extends Dialect {
 
-    public MySqlDialect(MappedStatement mappedStatement, Object parameterObject, PageBounds page) {
-        super(mappedStatement, parameterObject, page);
+    public MySqlDialect(String sql, PageBounds pageBounds) {
+        super(sql, pageBounds);
     }
 
     @Override

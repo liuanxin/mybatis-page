@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author https://github.com/liuanxin
@@ -16,13 +17,26 @@ public class UserTest extends BaseDao {
 
     @Test
     public void user() {
-        List<User> userList = userPage(2, 20);
-        Assert.assertEquals(20, userList.size());
-        // 如果能转换成功说明是走了分页插件的
+        List<User> userList = userPage(1, 10);
+        Assert.assertEquals(10, userList.size());
         Assert.assertTrue(userList instanceof PageList);
-        // 如果数值正确说明是走了 select count 查询的
-        Assert.assertEquals(200, ((PageList) userList).getTotal());
 
+        userList = userPage(2, 20);
+        Assert.assertEquals(5, userList.size());
+        Assert.assertEquals(25, ((PageList) userList).getTotal());
+
+
+        userList = userPageMap("", "", 1, 10);
+        Assert.assertEquals(10, userList.size());
+        Assert.assertTrue(userList instanceof PageList);
+
+        userList = userPageMap("", "", 2, 20);
+        Assert.assertEquals(5, userList.size());
+        Assert.assertEquals(25, ((PageList) userList).getTotal());
+
+
+        userList = userPageMap("0", "a", 2, 2);
+        System.out.println(((PageList) userList).getTotal());
         for (User user : userList) {
             System.out.println(user);
         }
@@ -35,6 +49,26 @@ public class UserTest extends BaseDao {
         try {
             session = getSqlSession();
             return session.selectList("com.github.liuanxin.page.findUser", new HashMap(), pageBounds);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+    private List<User> userPageMap(String userName, String password, int page, int size) {
+        PageBounds pageBounds = new PageBounds(page, size);
+        Map<String, String> param = new HashMap<String, String>();
+        if (userName != null && !"".equals(userName)) {
+            param.put("userName", "%" + userName + "%");
+        }
+        if (password != null && !"".equals(password)) {
+            param.put("password", "%" + password + "%");
+        }
+
+        SqlSession session = null;
+        try {
+            session = getSqlSession();
+            return session.selectList("com.github.liuanxin.page.findUserByMap", param, pageBounds);
         } finally {
             if (session != null) {
                 session.close();

@@ -5,10 +5,10 @@ import com.github.liuanxin.page.dialect.DialectUtil;
 import com.github.liuanxin.page.model.PageBounds;
 import com.github.liuanxin.page.model.PageList;
 import com.github.liuanxin.page.util.PageUtil;
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
@@ -24,10 +24,14 @@ import java.util.Properties;
  * @author https://github.com/liuanxin
  */
 @Intercepts({
-        @Signature(
-                type = Executor.class, method = "query",
-                args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}
-        )
+    @Signature(
+        type = Executor.class, method = "query",
+        args = { MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class }
+    ),
+    @Signature(
+        type = Executor.class, method = "query",
+        args = { MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class }
+    )
 })
 public class PageInterceptor implements Interceptor {
 
@@ -45,10 +49,6 @@ public class PageInterceptor implements Interceptor {
     @SuppressWarnings("unchecked")
     @Override
     public Object intercept(final Invocation invocation) throws Throwable {
-        if (dialect == null) {
-            return invocation.proceed();
-        }
-
         Object[] args = invocation.getArgs();
         Object rowBounds = args[ROW_INDEX];
         if (!(rowBounds instanceof PageBounds)) {
@@ -60,43 +60,51 @@ public class PageInterceptor implements Interceptor {
         }
 
         final MappedStatement ms = (MappedStatement) args[MAPPED_INDEX];
+        if (dialect == null) {
+            loadDialectWithDataSource(ms);
+        }
+
         final Object param = args[PARAM_INDEX];
+
         final Dialect dialectInstance;
         try {
-            Constructor constructor = dialect.getConstructor(MappedStatement.class, Object.class, PageBounds.class);
-            Object[] constructorParams = new Object[] { ms, param, page };
-            dialectInstance = (Dialect) constructor.newInstance(constructorParams);
+            Constructor constructor = dialect.getConstructor(String.class, PageBounds.class);
+            dialectInstance = (Dialect) constructor.newInstance(ms.getBoundSql(param).getSql(), page);
         } catch (Exception e) {
             throw new RuntimeException("Cannot instance dialect instance: " + dialect, e);
         }
-
-        final BoundSql boundSql = ms.getBoundSql(param);
+        // Just <sql> diff, RowBounds use default.
+        args[ROW_INDEX] = RowBounds.DEFAULT;
 
         Integer count = null;
         if (page.isQueryTotal()) {
-            Executor executor = (Executor) invocation.getTarget();
             String countSQL = dialectInstance.getCountSQL();
-            count = PageUtil.getCount(executor, ms, param, page, countSQL);
+            args[MAPPED_INDEX] = PageUtil.copyFromNewSql(ms, param, countSQL, true);
+            // handler count query
+            List countObj = (List) invocation.proceed();
 
-            // if count was 0, don't need to query page data
-            if (count == 0) {
-                return new PageList(Collections.emptyList(), 0);
+            if (countObj != null && countObj.size() > 0) {
+                count = (Integer) countObj.get(0);
+
+                // if count was 0, don't need to query page data
+                if (count != null && count == 0) {
+                    return new PageList(Collections.emptyList(), 0);
+                }
             }
         }
 
-        List<ParameterMapping> mappings = dialectInstance.getParameterMappings();
-        Object parameterObject = dialectInstance.getParameterObject();
         String pageSQL = dialectInstance.getPageSQL(count);
-
-        args[MAPPED_INDEX] = PageUtil.copyFromNewSql(ms, boundSql, pageSQL, mappings, parameterObject);
-        args[PARAM_INDEX] = parameterObject;
-        args[ROW_INDEX] = RowBounds.DEFAULT;
-
+        args[MAPPED_INDEX] = PageUtil.copyFromNewSql(ms, param, pageSQL, false);
+        // handler page query
         List list = (List) invocation.proceed();
 
-        return (count != null && count > 0)
-                ? new PageList((list == null || list.size() == 0 ? Collections.emptyList() : list), count)
-                : list;
+        if (count != null && count > 0) {
+            if (list == null || list.size() == 0) {
+                return new PageList(Collections.emptyList(), count);
+            }
+            return new PageList(list, count);
+        }
+        return list;
     }
 
     @Override
@@ -106,20 +114,26 @@ public class PageInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-        setDialect(properties.getProperty("dialect"));
+        String dialect = properties.getProperty("dialect");
+        if (dialect != null && !"".equals(dialect)) {
+            setDialect(dialect);
+        }
     }
 
-
     public PageInterceptor setDialect(String dialect) {
-        if (dialect == null || "".equals(dialect.trim())) {
-            throw new RuntimeException("must set dialect");
-        }
-
         Class<? extends Dialect> clazz = DialectUtil.getDialect(dialect);
         if (clazz == null) {
             throw new RuntimeException("no support db dialect with " + dialect);
         }
         this.dialect = clazz;
         return this;
+    }
+
+    private void loadDialectWithDataSource(MappedStatement ms) {
+        // read from connection by data source
+        dialect = DialectUtil.getDbType(ms.getConfiguration().getEnvironment().getDataSource());
+        if (dialect == null) {
+            throw new RuntimeException("must have dialect info");
+        }
     }
 }

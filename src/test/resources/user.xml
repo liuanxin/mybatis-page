@@ -10,4 +10,16 @@
     <select id="findUser" resultMap="BaseResultMap">
         select * from `t_user`
     </select>
+
+    <select id="findUserByMap" resultMap="BaseResultMap">
+        select * from `t_user`
+        <where>
+            <if test="userName != null">
+                AND `user_name` like #{userName}
+            </if>
+            <if test="password != null">
+                AND `password` like #{password}
+            </if>
+        </where>
+    </select>
 </mapper>

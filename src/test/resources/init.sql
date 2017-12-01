@@ -25,6 +25,5 @@ begin
 end//
 DELIMITER ;
 
--- 生成 200 条随机数据
-CALL test_user(200);
+CALL test_user(25);
 DROP PROCEDURE `test_user`;

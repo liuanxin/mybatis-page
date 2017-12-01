@@ -2,15 +2,14 @@ package com.github.liuanxin.page.dialect.impl;
 
 import com.github.liuanxin.page.dialect.Dialect;
 import com.github.liuanxin.page.model.PageBounds;
-import org.apache.ibatis.mapping.MappedStatement;
 
 /**
  * @author https://github.com/liuanxin
  */
 public class OracleDialect extends Dialect {
 
-    public OracleDialect(MappedStatement mappedStatement, Object parameterObject, PageBounds page) {
-        super(mappedStatement, parameterObject, page);
+    public OracleDialect(String sql, PageBounds pageBounds) {
+        super(sql, pageBounds);
     }
 
     /*

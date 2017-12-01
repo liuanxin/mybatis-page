@@ -2,7 +2,6 @@ package com.github.liuanxin.page.dialect.impl;
 
 import com.github.liuanxin.page.dialect.Dialect;
 import com.github.liuanxin.page.model.PageBounds;
-import org.apache.ibatis.mapping.MappedStatement;
 
 /**
  * SQLite 可以用此种方式, 也可以用 MySQL 的方式
@@ -11,8 +10,8 @@ import org.apache.ibatis.mapping.MappedStatement;
  */
 public class H2Dialect extends Dialect {
 
-    public H2Dialect(MappedStatement mappedStatement, Object parameterObject, PageBounds pageBounds) {
-        super(mappedStatement, parameterObject, pageBounds);
+    public H2Dialect(String sql, PageBounds pageBounds) {
+        super(sql, pageBounds);
     }
 
     @Override
