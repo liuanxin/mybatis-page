@@ -40,8 +40,8 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
   <!--
   除 sql server 2012 需要设置成 sqlserver2012(如果不设置将会使用 sqlserver2005 规则)外, 其他可以不设置
 
-  目前支持的方言如下：
-    h2、sqlite、mysql、mariadb、oracle、postgresql、sqlite、sqlserver2000、sqlserver2005、sqlserver2012
+  目前支持的方言有：
+    h2、sqlite、mysql、mariadb、oracle、postgresql、sqlserver2000、sqlserver2005、sqlserver2012
   -->
   <plugin interceptor="com.github.liuanxin.page.PageInterceptor"/>
 </plugins>
