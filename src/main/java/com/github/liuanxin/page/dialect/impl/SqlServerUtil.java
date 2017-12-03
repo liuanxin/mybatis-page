@@ -102,7 +102,7 @@ class SqlServerUtil {
     /** 不带 select 和 order by xx 的原始 sql */
     private static String noSelectNoOrderSql(String sql) {
         String upperCase = sql.toUpperCase();
-        int start = upperCase.indexOf(SELECT) + SELECT_LEN;
+        int start = upperCase.indexOf(SELECT) + (upperCase.contains(DISTINCT) ? DISTINCT_LEN : SELECT_LEN);
         int end = upperCase.indexOf(ORDER_BY);
         if (end <= 0) {
             end = sql.length();

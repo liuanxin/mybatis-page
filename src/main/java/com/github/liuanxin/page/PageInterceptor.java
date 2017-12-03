@@ -65,7 +65,6 @@ public class PageInterceptor implements Interceptor {
         }
 
         final Object param = args[PARAM_INDEX];
-
         final Dialect dialectInstance;
         try {
             Constructor constructor = dialect.getConstructor(String.class, PageBounds.class);
