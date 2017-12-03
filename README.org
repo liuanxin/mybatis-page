@@ -37,10 +37,10 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 #+BEGIN_SRC xml
 <plugins>
   <!--
-  除 sql server 2012 需要设置成 sqlserver2012(如果不设置将会使用 sqlserver2005 规则)外, 其他可以不设置
+  除 sql server 2012(及以上) 需要设置成相关的版本(如果不设置将会使用 sqlserver2005 规则)外, 其他可以不设置
 
   目前支持的方言有：
-    h2、sqlite、postgresql、mysql、mariadb、oracle、sqlserver2000、sqlserver2005、sqlserver2012
+    h2、sqlite、postgresql、mysql、mariadb、oracle、sqlserver(2012 及以上需要设置成对应版本. 如: sqlserver2012, sqlserver2014 etc...)
   -->
   <plugin interceptor="com.github.liuanxin.page.PageInterceptor"/>
   <!--
