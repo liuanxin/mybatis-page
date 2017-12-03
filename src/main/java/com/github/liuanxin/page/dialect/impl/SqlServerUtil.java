@@ -88,7 +88,7 @@ class SqlServerUtil {
         return sbd.toString();
     }
     private static boolean hasDistinct(String sql) {
-        return sql.contains(SELECT_DISTINCT);
+        return sql.toUpperCase().contains(SELECT_DISTINCT);
     }
     /** 排序字段, 如果语句中没有使用时间 */
     private static String orderBy(String sql) {
