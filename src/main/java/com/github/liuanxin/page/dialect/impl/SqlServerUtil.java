@@ -9,7 +9,7 @@ class SqlServerUtil {
     private static final int SELECT_LEN = SELECT.length();
 
     private static final String DISTINCT = " DISTINCT ";
-    private static final String SELECT_DISTINCT = (SELECT + DISTINCT).replace("  ", " ");
+    private static final String SELECT_DISTINCT = "SELECT DISTINCT ";
     private static final int DISTINCT_LEN = SELECT_DISTINCT.length();
 
     private static final String ORDER_BY = "ORDER BY ";
