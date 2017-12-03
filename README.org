@@ -21,7 +21,7 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(datasource());
     
-    // 不设置方言将会自动从数据源判断, sqlserver2012 不设置将使用 2005 的方言
+    // 不设置方言将会自动从数据源判断, sqlserver2012 及以上不设置将使用 2005 的方言
     sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor() });
     // sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("mysql") }); // or
     // sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor().setDialect("mysql") }); // or
@@ -37,7 +37,7 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 #+BEGIN_SRC xml
 <plugins>
   <!--
-  除 sql server 2012(及以上) 需要设置成相关的版本(如果不设置将会使用 sqlserver2005 规则)外, 其他可以不设置
+  除 sql server 2012(及以上)需要设置成相关的版本(如果不设置将会使用 sqlserver2005 规则)外, 其他可以不设置
 
   目前支持的方言有：
     h2、sqlite、postgresql、mysql、mariadb、oracle、sqlserver(2012 及以上需要设置成对应版本. 如: sqlserver2012, sqlserver2014 等)
