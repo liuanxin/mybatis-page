@@ -24,13 +24,19 @@ public class DialectUtil {
         DIALECT_MAP.put("mysql", MySqlDialect.class);
         DIALECT_MAP.put("mariadb", MySqlDialect.class);
         
+        
         DIALECT_MAP.put("microsoft", SQLServer2000Dialect.class); // for sql server 2000 jdbc
         DIALECT_MAP.put("sqlserver", SQLServer2005Dialect.class); // for sql server 2005/2008 jdbc
         
         DIALECT_MAP.put("sqlserver2000", SQLServer2000Dialect.class);
+        
         DIALECT_MAP.put("sqlserver2005", SQLServer2005Dialect.class);
         DIALECT_MAP.put("sqlserver2008", SQLServer2005Dialect.class);
+        // same with sql server 2012 and above
         DIALECT_MAP.put("sqlserver2012", SQLServer2012Dialect.class);
+        DIALECT_MAP.put("sqlserver2014", SQLServer2012Dialect.class);
+        DIALECT_MAP.put("sqlserver2016", SQLServer2012Dialect.class);
+        DIALECT_MAP.put("sqlserver2017", SQLServer2012Dialect.class);
     }
 
     public static Class<? extends Dialect> getDialect(String dialect) {
