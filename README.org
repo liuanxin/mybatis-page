@@ -21,8 +21,10 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(datasource());
     
-    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("mysql") });
-    // sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor().setDialect("mysql") }); // or
+    // 不设置方言将会自动从数据源判断, sqlserver2012 不设置将使用 2005 的方言
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor() });
+    // sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("mysql") }); // or
+    // sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor().setDialect("mysql") }); // or
 
     // load xml & handler
     sessionFactory.setMapperLocations(...);
