@@ -34,16 +34,18 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 或者写进 mybatis-config.xml
 #+BEGIN_SRC xml
 <plugins>
-  <plugin interceptor="com.github.liuanxin.page.PageInterceptor">
-    <property name="dialect" value="mysql"/>
-  </plugin>
   <!--
   除 sql server 2012 需要设置成 sqlserver2012(如果不设置将会使用 sqlserver2005 规则)外, 其他可以不设置
 
   目前支持的方言有：
-    h2、sqlite、mysql、mariadb、oracle、postgresql、sqlserver2000、sqlserver2005、sqlserver2012
+    h2、sqlite、postgresql、mysql、mariadb、oracle、sqlserver2000、sqlserver2005、sqlserver2012
   -->
   <plugin interceptor="com.github.liuanxin.page.PageInterceptor"/>
+  <!--
+  <plugin interceptor="com.github.liuanxin.page.PageInterceptor">
+    <property name="dialect" value="mysql"/>
+  </plugin>
+  -->
 </plugins>
 #+END_SRC
 
@@ -113,7 +115,6 @@ public JsonResult<List<User>> user(PageBounds page) {
 #+END_SRC
 
 此时, 将 spring mvc 默认的 ObjectMapping 替换成 PageListToJsonMapper
-
 #+BEGIN_SRC java
 @Override
 public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -126,7 +127,6 @@ public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 #+END_SRC
 
 以后的输出会是下面这样(这样对于 controller service 是完全透明的)
-
 #+BEGIN_SRC json
 {
   "code": 1,
