@@ -29,7 +29,8 @@ class SqlServerUtil {
     2005 开始使用 row_number() 函数来分页
 
     with paged as (
-      select top :offset + :limit row_number() over(order by ...) as rn_,
+      select -- top :offset + :limit
+      row_number() over(order by ...) as rn_,
       xxx from xxx       -- 不带 select 和 order by xx 的原始 sql
     ) select * from paged
     where rn_ > :offset and rn_ <= :offset + :limit
@@ -37,19 +38,20 @@ class SqlServerUtil {
     或者下面的语句
 
     select * from (
-      select top :offset + :limit row_number() over (order by ...) as rn_,
+      select -- top :offset + :limit
+      row_number() over (order by ...) as rn_,
       xxx from xxx       -- 不带 select 和 order by xx 的原始 sql
-    ) a_ where rn_ > :offset and rn_ <= :offset + :limit
+    ) a_ where a_.rn_ > :offset and a_.rn_ <= :offset + :limit
 
 
-    单从使用上来说, row_number() 是最为复杂的版本. 下面的方式只支持 sql server 2012
+    单从使用上来说, row_number() 是最为复杂的版本. 下面的方式只支持 sql server 2012 及以上的版本
 
     select xxx from xxx order by xx   -- 原始 sql
     offset :offset rows
     fetch next :limit rows only
     */
 
-    /** 只在 2012 的版本开始才有效 */
+    /** 只在 2012 及以上的版本开始才有效 */
     static String fetchNext(String sql, int offset, int limit) {
         StringBuilder sbd = new StringBuilder(50 + sql.length());
         sbd.append(sql).append(" ");
@@ -67,23 +69,25 @@ class SqlServerUtil {
     static String rowNum(String sql, int offset, int limit) {
         StringBuilder sbd = new StringBuilder(50 + sql.length());
         /*
-        sbd.append("with paged as ( select ");
+        sbd.append("WITH PAGED AS ( SELECT ");
         if (hasDistinct(sql)) {
             sbd.append(DISTINCT);
         }
-        sbd.append(" top ").append(offset + limit);
-        sbd.append(" row_number() over (").append(orderBy(sql)).append(" rn_, ").append(noSelectNoOrderSql(sql));
-        sbd.append(" ) select * from paged");
-        sbd.append(" where rn_ > ").append(offset).append(" and rn_ <= ").append(offset + limit);
+        // sbd.append(" TOP ").append(offset + limit);
+        sbd.append(" ROW_NUMBER() OVER (").append(orderBy(sql)).append(") AS RN_, ");
+        sbd.append(noSelectNoOrderSql(sql));
+        sbd.append(" ) SELECT * FROM PAGED");
+        sbd.append(" WHERE RN_ > ").append(offset).append(" AND RN_ <= ").append(offset + limit);
         */
 
-        sbd.append("select * from ( select ");
+        sbd.append("SELECT * FROM ( SELECT ");
         if (hasDistinct(sql)) {
             sbd.append(DISTINCT);
         }
-        sbd.append(" top ").append(offset + limit);
-        sbd.append(" row_number() over (").append(orderBy(sql)).append(" rn_, ").append(noSelectNoOrderSql(sql));
-        sbd.append(" ) a_ where rn_ > ").append(offset).append(" and rn_ <= ").append(offset + limit);
+        // sbd.append(" TOP top ").append(offset + limit);
+        sbd.append(" ROW_NUMBER() OVER (").append(orderBy(sql)).append(") AS RN_, ");
+        sbd.append(noSelectNoOrderSql(sql));
+        sbd.append(" ) A_ WHERE RN_ > ").append(offset).append(" AND RN_ <= ").append(offset + limit);
 
         return sbd.toString();
     }
