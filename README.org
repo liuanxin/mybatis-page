@@ -85,7 +85,7 @@ List<User> selectByExample(UserExample example);
 List<User> selectByExample(UserExample example, com.github.liuanxin.page.model.PageBounds page);
 #+END_SRC
 
-分页插件会根据当前数据库方言添加 limit rownum 等(目前只支持 mysql 和 oracle).
+分页插件会根据当前数据库方言添加 limit rownum 等.
 
 
 ** 返回数据
@@ -169,4 +169,3 @@ public void addInterceptors(InterceptorRegistry registry) {
 #+END_SRC
 
 这样到了 user 页面的时候, 上下文中将会有 *userListTotal* 这个值, 页面根据请求调用前的 page 和 limit 以及具体的 *userListTotal* 值输出 相关的 1 2 3 及置灰相关的按钮.
-
