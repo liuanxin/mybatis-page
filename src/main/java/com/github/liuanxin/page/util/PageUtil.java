@@ -16,8 +16,17 @@ public class PageUtil {
     private static class BoundSqlSqlSource implements SqlSource {
         private BoundSql boundSql;
         BoundSqlSqlSource(MappedStatement ms, Object parameter, String sql) {
-            List<ParameterMapping> parameterMappings = ms.getBoundSql(parameter).getParameterMappings();
+            BoundSql oldBoundSql = ms.getBoundSql(parameter);
+            List<ParameterMapping> parameterMappings = oldBoundSql.getParameterMappings();
             this.boundSql = new BoundSql(ms.getConfiguration(), sql, parameterMappings, parameter);
+
+            // handler 「There is no getter for property named '__frch_criterion_1'」 Exception
+            for (ParameterMapping mapping : parameterMappings) {
+                String property = mapping.getProperty();
+                if (oldBoundSql.hasAdditionalParameter(property)) {
+                    this.boundSql.setAdditionalParameter(property, oldBoundSql.getAdditionalParameter(property));
+                }
+            }
         }
 
         @Override
