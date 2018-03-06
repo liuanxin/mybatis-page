@@ -168,4 +168,4 @@ public void addInterceptors(InterceptorRegistry registry) {
 }
 #+END_SRC
 
-这样到了 user 页面的时候, 上下文中将会有 userList*Total* 这个值, 页面根据请求调用前的 page 和 limit 以及具体的 userList*Total* 值输出 相关的 1 2 3 及置灰相关的按钮.
+这样到了 user 页面的时候, 上下文中将会有 *userListTotal* 这个值, 页面根据请求调用前的 page 和 limit 以及具体的 *userListTotal* 值输出 相关的 1 2 3 及置灰相关的按钮.
