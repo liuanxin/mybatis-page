@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class Dialect {
 
     private static final String FOR_UPDATE = " FOR UPDATE";
-    private static final String ORDER_BY = "ORDER BY ";
+    private static final String ORDER_BY = " ORDER BY ";
     /** multi blank char */
     private static final Pattern BLANK_REGEX = Pattern.compile("\\s{2,}");
 
