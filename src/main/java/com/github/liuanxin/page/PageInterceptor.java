@@ -96,14 +96,15 @@ public class PageInterceptor implements Interceptor {
         args[MAPPED_INDEX] = PageUtil.copyFromNewSql(ms, param, pageSQL, false);
         // handler page query
         List list = (List) invocation.proceed();
+        if (count == null) {
+            return list;
+        }
 
-        if (count != null && count > 0) {
-            if (list == null || list.size() == 0) {
-                return new PageList(Collections.emptyList(), count);
-            }
+        if (list == null || list.isEmpty()) {
+            return new PageList(Collections.emptyList(), count);
+        } else {
             return new PageList(list, count);
         }
-        return list;
     }
 
     @Override

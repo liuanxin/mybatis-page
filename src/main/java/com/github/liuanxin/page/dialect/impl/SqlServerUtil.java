@@ -12,7 +12,7 @@ class SqlServerUtil {
     private static final String SELECT_DISTINCT = "SELECT DISTINCT ";
     private static final int DISTINCT_LEN = SELECT_DISTINCT.length();
 
-    private static final String ORDER_BY = "ORDER BY ";
+    private static final String ORDER_BY = " ORDER BY ";
     private static final String DEFAULT_ORDER_BY = " ORDER BY 1 ";
 
     /** 主要针对于 sql server 2000 或 只查询头几条数据的 sql 语句, 这是最简单的处理方式(select top xxx) */

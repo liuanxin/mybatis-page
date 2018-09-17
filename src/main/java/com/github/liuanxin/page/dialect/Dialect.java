@@ -11,6 +11,10 @@ public class Dialect {
 
     private static final String FOR_UPDATE = " FOR UPDATE";
     private static final String ORDER_BY = " ORDER BY ";
+    private static final String GROUP_BY = " GROUP BY ";
+    // COUNT (*) is the sql specification, it's not slower than COUNT (NUM)
+    private static final String COUNT = "SELECT COUNT(*) FROM ";
+
     /** multi blank char */
     private static final Pattern BLANK_REGEX = Pattern.compile("\\s{2,}");
 
@@ -54,17 +58,22 @@ public class Dialect {
 
     public String getCountSQL() {
         String countSql = sql;
+
         String upperCase = countSql.toUpperCase();
         // count sql query don't need <for update>
         if (upperCase.endsWith(FOR_UPDATE)) {
             countSql = countSql.substring(0, countSql.length() - FOR_UPDATE.length());
         }
-        // count sql query don't need <order by xxx>
-        if (upperCase.contains(ORDER_BY)) {
-            countSql = countSql.substring(0, upperCase.indexOf(ORDER_BY));
+
+        if (upperCase.contains(GROUP_BY)) {
+            return COUNT + " (" + countSql + ") TEMP_COUNT";
+        } else {
+            // count sql query don't need <order by xxx>
+            if (upperCase.contains(ORDER_BY)) {
+                countSql = countSql.substring(0, upperCase.indexOf(ORDER_BY));
+            }
+            return countSql.replaceFirst("(?i)SELECT (.*)? FROM ", COUNT);
         }
-        // COUNT (*) is the sql specification, it's not slower than COUNT (NUM)
-        return "SELECT COUNT(*) FROM (" + countSql + ") TEMP_COUNT";
     }
 
     protected String getLimitString(String sql, int offset, int limit) {
