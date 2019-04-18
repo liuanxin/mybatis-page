@@ -8,6 +8,7 @@ import java.util.Collection;
  */
 public class PageList<E> extends ArrayList<E> {
 
+    /** save with: select count(*) from ... */
     private int total;
 
     public PageList() {

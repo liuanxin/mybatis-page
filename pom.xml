@@ -11,13 +11,13 @@
 
     <groupId>com.github.liuanxin</groupId>
     <artifactId>mybatis-page</artifactId>
-    <version>1.2.4</version>
+    <version>1.2.5</version>
     <description>database page with mybatis plugin</description>
 
     <developers>
         <developer>
             <name>Tony Liu</name>
-            <email>liu.anxin13@gmail.com</email>
+            <email>liu.anxin13 at gmail.com</email>
         </developer>
     </developers>
 
@@ -27,7 +27,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <slf4j.version>1.7.25</slf4j.version>
-        <mybatis.version>3.4.4</mybatis.version>
+        <mybatis.version>3.5.0</mybatis.version>
         <jackson.version>2.9.6</jackson.version>
         <spring.version>4.3.9.RELEASE</spring.version>
         <servlet-api.version>3.1.0</servlet-api.version>
