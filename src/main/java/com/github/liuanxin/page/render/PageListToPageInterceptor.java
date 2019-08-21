@@ -30,7 +30,7 @@ public class PageListToPageInterceptor implements HandlerInterceptor {
     public void postHandle(HttpServletRequest request, HttpServletResponse response,
                            Object handler, ModelAndView modelAndView) throws Exception {
         if (modelAndView != null) {
-            Map<String, Object> newModel = new HashMap<String, Object>();
+            Map<String, Object> newModel = new HashMap<>();
             for (Map.Entry<String, Object> item : modelAndView.getModel().entrySet()) {
                 Object value = item.getValue();
                 if (value instanceof PageList) {

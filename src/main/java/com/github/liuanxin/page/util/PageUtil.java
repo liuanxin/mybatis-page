@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class PageUtil {
 
-    private static final List<ResultMapping> EMPTY_RESULT_MAPPINGS = new ArrayList<ResultMapping>(0);
+    private static final List<ResultMapping> EMPTY_RESULT_MAPPINGS = new ArrayList<>(0);
 
     private static class BoundSqlSqlSource implements SqlSource {
         private BoundSql boundSql;

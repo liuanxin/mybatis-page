@@ -36,7 +36,7 @@ public class Dialect {
         }
         // multi blank replace to one blank
         this.sql = BLANK_REGEX.matcher(sbd.toString()).replaceAll(BLANK).trim();
-        this.pageParams = new LinkedHashMap<String, Object>();
+        this.pageParams = new LinkedHashMap<>();
     }
 
     protected void addPageParam(String name, Object value) {

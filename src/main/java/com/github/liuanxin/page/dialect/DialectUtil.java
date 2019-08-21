@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class DialectUtil {
 
-    private static final Map<String, Class<? extends Dialect>> DIALECT_MAP = new HashMap<String, Class<? extends Dialect>>();
+    private static final Map<String, Class<? extends Dialect>> DIALECT_MAP = new HashMap<>();
     static {
         DIALECT_MAP.put("h2", H2Dialect.class);
 
@@ -47,9 +47,7 @@ public class DialectUtil {
         if (dataSource == null) {
             return null;
         }
-        Connection con = null;
-        try {
-            con = dataSource.getConnection();
+        try (Connection con = dataSource.getConnection()) {
             if (con == null) {
                 return null;
             }
@@ -68,13 +66,6 @@ public class DialectUtil {
             return null;
         } catch (SQLException e) {
             throw new RuntimeException("Cannot load db type with datasource.", e);
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException ignore) {
-                }
-            }
         }
     }
 }

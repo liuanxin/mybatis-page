@@ -26,12 +26,11 @@ public class PageListToJsonMapper extends ObjectMapper {
      */
     public PageListToJsonMapper() {
         super();
-
-        registerModule(new SimpleModule().addSerializer(PageList.class, new JsonSerializer<PageList>() {
+        super.registerModule(new SimpleModule().addSerializer(PageList.class, new JsonSerializer<PageList>() {
             @Override
             @SuppressWarnings("unchecked")
             public void serialize(PageList value, JsonGenerator gen, SerializerProvider sp) throws IOException {
-                Map<String, Object> returnMap = new HashMap<String, Object>();
+                Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("items", new ArrayList(value));
                 returnMap.put("total", value.getTotal());
 

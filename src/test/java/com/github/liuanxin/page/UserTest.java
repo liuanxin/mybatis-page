@@ -45,19 +45,13 @@ public class UserTest extends BaseDao {
     private List<User> userPage(int page, int size) {
         PageBounds pageBounds = new PageBounds(page, size);
 
-        SqlSession session = null;
-        try {
-            session = getSqlSession();
+        try (SqlSession session = getSqlSession()) {
             return session.selectList("com.github.liuanxin.page.findUser", new HashMap(), pageBounds);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
     private List<User> userPageMap(String userName, String password, int page, int size) {
         PageBounds pageBounds = new PageBounds(page, size);
-        Map<String, String> param = new HashMap<String, String>();
+        Map<String, String> param = new HashMap<>();
         if (userName != null && !"".equals(userName)) {
             param.put("userName", "%" + userName + "%");
         }
@@ -65,14 +59,8 @@ public class UserTest extends BaseDao {
             param.put("password", "%" + password + "%");
         }
 
-        SqlSession session = null;
-        try {
-            session = getSqlSession();
+        try (SqlSession session = getSqlSession()) {
             return session.selectList("com.github.liuanxin.page.findUserByMap", param, pageBounds);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 }
