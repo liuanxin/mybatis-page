@@ -19,17 +19,17 @@ public class DialectUtil {
 
         DIALECT_MAP.put("postgresql", PostgreSQLDialect.class);
         DIALECT_MAP.put("oracle", OracleDialect.class);
-        
+
         DIALECT_MAP.put("sqlite", MySqlDialect.class);
         DIALECT_MAP.put("mysql", MySqlDialect.class);
         DIALECT_MAP.put("mariadb", MySqlDialect.class);
-        
-        
+
+
         DIALECT_MAP.put("microsoft", SQLServer2000Dialect.class); // for sql server 2000 jdbc
         DIALECT_MAP.put("sqlserver", SQLServer2005Dialect.class); // for sql server 2005/2008 jdbc
-        
+
         DIALECT_MAP.put("sqlserver2000", SQLServer2000Dialect.class);
-        
+
         DIALECT_MAP.put("sqlserver2005", SQLServer2005Dialect.class);
         DIALECT_MAP.put("sqlserver2008", SQLServer2005Dialect.class);
         // same with sql server 2012 and above
@@ -60,7 +60,8 @@ public class DialectUtil {
             for (Map.Entry<String, Class<? extends Dialect>> entry : DIALECT_MAP.entrySet()) {
                 // sql server 2005 same to 2012, so if use sql server 2012, must manual setting
                 // if use <log4jdbc> framework to record complete sql
-                if (url.startsWith("jdbc:" + entry.getKey() + ":") || url.startsWith("jdbc:log4jdbc:" + entry.getKey() + ":")) {
+                if (url.startsWith("jdbc:" + entry.getKey() + ":")
+                        || url.startsWith("jdbc:log4jdbc:" + entry.getKey() + ":")) {
                     return entry.getValue();
                 }
             }
@@ -71,8 +72,7 @@ public class DialectUtil {
             if (con != null) {
                 try {
                     con.close();
-                } catch (SQLException e) {
-                    // ignore
+                } catch (SQLException ignore) {
                 }
             }
         }

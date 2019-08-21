@@ -35,23 +35,24 @@ public class OracleDialect extends Dialect {
     */
 
     @Override
-    protected String getLimitString(String sql, int offset, int limit) {
+    protected String getLimitString(String sql, String offsetName, int offset, String limitName, int limit) {
         StringBuilder sbd = new StringBuilder(60 + sql.length()).append(sql.length());
         if (offset > 0) {
-            sbd.append("SELECT * FROM (")
-                    .append("SELECT A_.*, ROWNUM RN_ FROM (")
-                    .append(sql)
-                    .append(") A_ WHERE ROWNUM <= ").append(offset + limit);
-            sbd.append(") WHERE RN_ > ").append(offset);
+            sbd.append("SELECT * FROM (");
+            sbd.append("SELECT A_.*, ROWNUM RN_ FROM (").append(sql).append(") A_ WHERE ROWNUM <= ?");
+            sbd.append(") WHERE RN_ > ?");
+            super.addPageParam(limitName, offset + limit);
+            super.addPageParam(offsetName, offset);
             /*
-            sbd.append("SELECT * FROM (")
-                    .append("SELECT A_.*, ROWNUM RN_ FROM (")
-                    .append(sql)
-                    .append(") A_ ");
-            sbd.append(") WHERE RN_ <= ").append(offset + limit).append(" AND RN_ > ").append(offset);
+            sbd.append("SELECT * FROM (");
+            sbd.append("SELECT A_.*, ROWNUM RN_ FROM (").append(sql).append(") A_ ");
+            sbd.append(") WHERE RN_ <= ? AND RN_ > ?");
+            super.addPageParam(limitName, offset + limit);
+            super.addPageParam(offsetName, offset);
             */
         } else {
-            sbd.append("SELECT * FROM (").append(sql).append(") WHERE ROWNUM <= ").append(limit);
+            sbd.append("SELECT * FROM (").append(sql).append(") WHERE ROWNUM <= ?");
+            super.addPageParam(limitName, limit);
         }
         return sbd.toString();
     }

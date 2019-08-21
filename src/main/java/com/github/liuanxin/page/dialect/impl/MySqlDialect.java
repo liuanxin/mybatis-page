@@ -13,13 +13,16 @@ public class MySqlDialect extends Dialect {
     }
 
     @Override
-    protected String getLimitString(String sql, int offset, int limit) {
-        StringBuilder sbd = new StringBuilder(20 + sql.length());
+    protected String getLimitString(String sql, String offsetName, int offset, String limitName, int limit) {
+        StringBuilder sbd = new StringBuilder(15 + sql.length());
         sbd.append(sql);
         if (offset > 0) {
-            sbd.append(" LIMIT ").append(offset).append(", ").append(limit);
+            sbd.append(" LIMIT ?, ?");
+            super.addPageParam(offsetName, offset);
+            super.addPageParam(limitName, limit);
         } else {
-            sbd.append(" LIMIT ").append(limit);
+            sbd.append(" LIMIT ?");
+            super.addPageParam(limitName, limit);
         }
         return sbd.toString();
     }

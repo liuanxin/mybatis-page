@@ -2,6 +2,8 @@ package com.github.liuanxin.page.dialect;
 
 import com.github.liuanxin.page.model.PageBounds;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -12,14 +14,18 @@ public class Dialect {
     private static final String FOR_UPDATE = " FOR UPDATE";
     private static final String ORDER_BY = " ORDER BY ";
     private static final String GROUP_BY = " GROUP BY ";
+
+    private static final Pattern COUNT_REGEX = Pattern.compile("(?i)SELECT (.*)? FROM ");
     // COUNT (*) is the sql specification, it's not slower than COUNT (NUM)
     private static final String COUNT = "SELECT COUNT(*) FROM ";
 
     /** multi blank char */
     private static final Pattern BLANK_REGEX = Pattern.compile("\\s{2,}");
+    private static final String BLANK = " ";
 
     protected PageBounds page;
     private String sql;
+    private Map<String, Object> pageParams;
 
     public Dialect(String sql, PageBounds page) {
         this.page = page;
@@ -29,7 +35,16 @@ public class Dialect {
             sbd.deleteCharAt(sbd.length() - 1);
         }
         // multi blank replace to one blank
-        this.sql = BLANK_REGEX.matcher(sbd.toString()).replaceAll(" ").trim();
+        this.sql = BLANK_REGEX.matcher(sbd.toString()).replaceAll(BLANK).trim();
+        this.pageParams = new LinkedHashMap<String, Object>();
+    }
+
+    protected void addPageParam(String name, Object value) {
+        pageParams.put(name, value);
+    }
+
+    public Map<String, Object> getPageParams() {
+        return pageParams;
     }
 
     public String getPageSQL(Integer count) {
@@ -47,7 +62,7 @@ public class Dialect {
                 hasForUpdate = true;
             }
 
-            limitSql = getLimitString(limitSql, page.getOffset(), page.getLimit());
+            limitSql = getLimitString(limitSql, "_offset_", page.getOffset(), "_limit_", page.getLimit());
 
             if (hasForUpdate) {
                 limitSql = limitSql + FOR_UPDATE;
@@ -72,11 +87,12 @@ public class Dialect {
             if (upperCase.contains(ORDER_BY)) {
                 countSql = countSql.substring(0, upperCase.indexOf(ORDER_BY));
             }
-            return countSql.replaceFirst("(?i)SELECT (.*)? FROM ", COUNT);
+            return COUNT_REGEX.matcher(countSql).replaceFirst(COUNT);
         }
     }
 
-    protected String getLimitString(String sql, int offset, int limit) {
+    @SuppressWarnings("SameParameterValue")
+    protected String getLimitString(String sql, String offsetName, int offset, String limitName, int limit) {
         throw new UnsupportedOperationException("Must set Dialect! Just like MySql Oracle etc.");
     }
 }

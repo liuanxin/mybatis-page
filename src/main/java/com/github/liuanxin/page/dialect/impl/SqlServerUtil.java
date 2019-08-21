@@ -12,17 +12,15 @@ class SqlServerUtil {
     private static final String SELECT_DISTINCT = "SELECT DISTINCT ";
     private static final int DISTINCT_LEN = SELECT_DISTINCT.length();
 
-    private static final String ORDER_BY = " ORDER BY ";
-    private static final String DEFAULT_ORDER_BY = " ORDER BY 1 ";
+    static final String ORDER_BY = " ORDER BY ";
+    static final String DEFAULT_ORDER_BY = " ORDER BY 1 ";
 
-    /** 主要针对于 sql server 2000 或 只查询头几条数据的 sql 语句, 这是最简单的处理方式(select top xxx) */
-    static String topPage(String sql, int limit) {
+    /** 主要针对于 sql server 2000 或 只查询头几条数据的 sql 语句, 这是最简单的处理方式(select top 10 f1,f2,f3 from t_xxx ...) */
+    static String topPage(String sql) {
         String upperCase = sql.toUpperCase();
-        int insertPoint = upperCase.indexOf(SELECT) + (upperCase.contains(DISTINCT) ? DISTINCT_LEN : SELECT_LEN);
+        int insertPoint = upperCase.indexOf(SELECT) + (upperCase.startsWith(SELECT_DISTINCT) ? DISTINCT_LEN : SELECT_LEN);
 
-        return new StringBuilder(10 + sql.length())
-                .append(sql)
-                .insert(insertPoint, String.format(" TOP %d ", limit)).toString();
+        return new StringBuilder(sql).insert(insertPoint, " TOP ? ").toString();
     }
 
     /*
@@ -51,22 +49,8 @@ class SqlServerUtil {
     fetch next :limit rows only
     */
 
-    /** 只在 2012 及以上的版本开始才有效 */
-    static String fetchNext(String sql, int offset, int limit) {
-        StringBuilder sbd = new StringBuilder(50 + sql.length());
-        sbd.append(sql).append(" ");
-        if (!sql.toUpperCase().contains(ORDER_BY)) {
-            sbd.append(DEFAULT_ORDER_BY);
-        }
-        sbd.append(" OFFSET ").append(offset).append(" ROWS");
-        if (limit > 0) {
-            sbd.append(" FETCH NEXT ").append(limit).append(" ROWS ONLY");
-        }
-        return sbd.toString();
-    }
-
     /** 主要针对 2005 及 2008 支持 row_number 函数的版本 */
-    static String rowNum(String sql, int offset, int limit) {
+    static String rowNum(String sql) {
         StringBuilder sbd = new StringBuilder(50 + sql.length());
         /*
         sbd.append("WITH PAGED AS ( SELECT ");
@@ -77,7 +61,7 @@ class SqlServerUtil {
         sbd.append(" ROW_NUMBER() OVER (").append(orderBy(sql)).append(") AS RN_, ");
         sbd.append(noSelectNoOrderSql(sql));
         sbd.append(" ) SELECT * FROM PAGED");
-        sbd.append(" WHERE RN_ > ").append(offset).append(" AND RN_ <= ").append(offset + limit);
+        sbd.append(" WHERE RN_ > ? AND RN_ <= ?");
         */
 
         sbd.append("SELECT * FROM ( SELECT ");
@@ -87,8 +71,7 @@ class SqlServerUtil {
         // sbd.append(" TOP top ").append(offset + limit);
         sbd.append(" ROW_NUMBER() OVER (").append(orderBy(sql)).append(") AS RN_, ");
         sbd.append(noSelectNoOrderSql(sql));
-        sbd.append(" ) A_ WHERE RN_ > ").append(offset).append(" AND RN_ <= ").append(offset + limit);
-
+        sbd.append(" ) A_ WHERE RN_ > ? AND RN_ <= ?");
         return sbd.toString();
     }
     private static boolean hasDistinct(String sql) {

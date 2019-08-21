@@ -13,7 +13,8 @@ public class SQLServer2000Dialect extends Dialect {
     }
 
     @Override
-    protected String getLimitString(String sql, int offset, int limit) {
-        return SqlServerUtil.topPage(sql, limit);
+    protected String getLimitString(String sql, String offsetName, int offset, String limitName, int limit) {
+        super.addPageParam(limitName, limit);
+        return SqlServerUtil.topPage(sql);
     }
 }

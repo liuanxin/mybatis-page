@@ -13,11 +13,13 @@ public class PostgreSQLDialect extends Dialect {
     }
 
     @Override
-    protected String getLimitString(String sql, int offset, int limit) {
+    protected String getLimitString(String sql, String offsetName, int offset, String limitName, int limit) {
         StringBuilder sbd = new StringBuilder(20 + sql.length());
-        sbd.append(sql).append(" LIMIT ").append(limit);
+        sbd.append(sql).append(" LIMIT ?");
+        super.addPageParam(limitName, limit);
         if (offset > 0) {
-            sbd.append(" OFFSET ").append(offset);
+            sbd.append(" OFFSET ?");
+            super.addPageParam(offsetName, offset);
         }
         return sbd.toString();
     }

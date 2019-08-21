@@ -16,6 +16,7 @@ import org.apache.ibatis.session.RowBounds;
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -78,7 +79,8 @@ public class PageInterceptor implements Interceptor {
         Integer count = null;
         if (page.isQueryTotal()) {
             String countSQL = dialectInstance.getCountSQL();
-            args[MAPPED_INDEX] = PageUtil.copyFromNewSql(ms, param, countSQL, true);
+            Map<String, Object> pageParams = dialectInstance.getPageParams();
+            args[MAPPED_INDEX] = PageUtil.copyFromNewSql(ms, param, countSQL, pageParams, true);
             // handler count query
             List countObj = (List) invocation.proceed();
 
@@ -93,7 +95,8 @@ public class PageInterceptor implements Interceptor {
         }
 
         String pageSQL = dialectInstance.getPageSQL(count);
-        args[MAPPED_INDEX] = PageUtil.copyFromNewSql(ms, param, pageSQL, false);
+        Map<String, Object> pageParams = dialectInstance.getPageParams();
+        args[MAPPED_INDEX] = PageUtil.copyFromNewSql(ms, param, pageSQL, pageParams, false);
         // handler page query
         List list = (List) invocation.proceed();
         if (count == null) {

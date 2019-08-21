@@ -1,10 +1,12 @@
 package com.github.liuanxin.page.util;
 
 import org.apache.ibatis.mapping.*;
+import org.apache.ibatis.session.Configuration;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author https://github.com/liuanxin
@@ -15,16 +17,29 @@ public class PageUtil {
 
     private static class BoundSqlSqlSource implements SqlSource {
         private BoundSql boundSql;
-        BoundSqlSqlSource(MappedStatement ms, Object parameter, String sql) {
+        BoundSqlSqlSource(MappedStatement ms, Object parameter, String sql,
+                          Map<String, Object> pageParams, boolean countQuery) {
             BoundSql oldBoundSql = ms.getBoundSql(parameter);
             List<ParameterMapping> parameterMappings = oldBoundSql.getParameterMappings();
-            this.boundSql = new BoundSql(ms.getConfiguration(), sql, parameterMappings, parameter);
+
+            Configuration config = ms.getConfiguration();
+            boundSql = new BoundSql(config, sql, parameterMappings, parameter);
 
             // handler 「There is no getter for property named '__frch_criterion_1'」 Exception
             for (ParameterMapping mapping : parameterMappings) {
                 String property = mapping.getProperty();
                 if (oldBoundSql.hasAdditionalParameter(property)) {
-                    this.boundSql.setAdditionalParameter(property, oldBoundSql.getAdditionalParameter(property));
+                    boundSql.setAdditionalParameter(property, oldBoundSql.getAdditionalParameter(property));
+                }
+            }
+
+            if (!countQuery && pageParams != null && pageParams.size() > 0) {
+                for (Map.Entry<String, Object> entry : pageParams.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+
+                    boundSql.getParameterMappings().add(new ParameterMapping.Builder(config, key, value.getClass()).build());
+                    boundSql.setAdditionalParameter(key, value);
                 }
             }
         }
@@ -35,7 +50,8 @@ public class PageUtil {
         }
     }
 
-    public static MappedStatement copyFromNewSql(MappedStatement ms, Object parameter, String sql, boolean countQuery) {
+    public static MappedStatement copyFromNewSql(MappedStatement ms, Object parameter, String sql,
+                                                 Map<String, Object> pageParams, boolean countQuery) {
         // ms no set sql method...
 
         String id = ms.getId();
@@ -44,7 +60,10 @@ public class PageUtil {
             id += "_COUNT";
         }
         MappedStatement.Builder builder = new MappedStatement.Builder(
-                ms.getConfiguration(), id, new BoundSqlSqlSource(ms, parameter, sql), ms.getSqlCommandType()
+                ms.getConfiguration(),
+                id,
+                new BoundSqlSqlSource(ms, parameter, sql, pageParams, countQuery),
+                ms.getSqlCommandType()
         );
 
         builder.resource(ms.getResource());

@@ -13,11 +13,14 @@ public class SQLServer2005Dialect extends Dialect {
     }
 
     @Override
-    protected String getLimitString(String sql, int offset, int limit) {
+    protected String getLimitString(String sql, String offsetName, int offset, String limitName, int limit) {
         if (offset > 0) {
-            return SqlServerUtil.rowNum(sql, offset, limit);
+            super.addPageParam(offsetName, offset);
+            super.addPageParam(limitName, offset + limit);
+            return SqlServerUtil.rowNum(sql);
         } else {
-            return SqlServerUtil.topPage(sql, limit);
+            super.addPageParam(limitName, limit);
+            return SqlServerUtil.topPage(sql);
         }
     }
 }
