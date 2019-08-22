@@ -19,11 +19,11 @@ public class PageUtil {
             Configuration config = ms.getConfiguration();
             BoundSql oldBoundSql = ms.getBoundSql(parameter);
             List<ParameterMapping> parameterMappings = oldBoundSql.getParameterMappings();
-            // if size = 0, return has java.util.Collections.UnmodifiableCollection, add will throws UnsupportedOperationException
-            if (parameterMappings == null || parameterMappings.size() == 0) {
-                parameterMappings = new LinkedList<>();
-            }
             if (!countQuery && pageParams != null && pageParams.size() > 0) {
+                // if size = 0, return has java.util.Collections.UnmodifiableCollection, add will throws UnsupportedOperationException
+                if (parameterMappings == null || parameterMappings.size() == 0) {
+                    parameterMappings = new LinkedList<>();
+                }
                 for (Map.Entry<String, Object> entry : pageParams.entrySet()) {
                     String key = entry.getKey();
                     Object value = entry.getValue();
