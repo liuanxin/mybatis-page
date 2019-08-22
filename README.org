@@ -53,41 +53,10 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 </plugins>
 #+END_SRC
 
-实现类的 xml 应该是像下面这样
-#+BEGIN_SRC xml
-<resultMap id="BaseResultMap" type="com.xxx.model.User">
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="user_name" jdbcType="VARCHAR" property="userName" />
-    <result column="pass_word" jdbcType="VARCHAR" property="password" />
-</resultMap>
-
-<select id="selectByExample" parameterType="com.xxx.model.UserExample" resultMap="BaseResultMap">
-    select
-    <if test="distinct">
-        distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from `t_user`
-    <if test="_parameter != null">
-        <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-        order by ${orderByClause}
-    </if>
-</select>
-#+END_SRC
-
-接口类 UserMapper.java 文件有像下面这样的一个方法
-#+BEGIN_SRC java
-List<User> selectByExample(UserExample example);
-#+END_SRC
-
-此时可以添加一个新方法到 UserMapper.java 中(实现都是基于上面的 xml), 而后使用此方法查询数据库时将会发起分页操作.
+添加一个新方法到 UserMapper.java 中(实现都是基于上面的 xml)
 #+BEGIN_SRC java
 List<User> selectByExample(UserExample example, com.github.liuanxin.page.model.PageBounds page);
 #+END_SRC
-
-分页插件会根据当前数据库方言添加 limit rownum 等.
 
 
 ** 返回数据
