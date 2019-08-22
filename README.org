@@ -1,4 +1,6 @@
 
+[[README.org][English Readme]]
+
 ** 分页
 
   基于 mybatis 的分页插件
@@ -10,7 +12,7 @@
 <dependency>
     <groupId>com.github.liuanxin</groupId>
     <artifactId>mybatis-page</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
 </dependency>
 #+END_SRC
 
@@ -20,7 +22,7 @@
 public SqlSessionFactory sqlSessionFactory() throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(datasource());
-    
+
     // 不设置方言将会自动从数据源判断, sqlserver2012 及以上不设置将使用 2005 的方言
     sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor() });
     // sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("mysql") }); // or

@@ -1,0 +1,48 @@
+
+[[README-CN.org][中文说明]]
+
+** mybatis page
+
+add maven
+#+BEGIN_SRC xml
+<dependency>
+    <groupId>com.github.liuanxin</groupId>
+    <artifactId>mybatis-page</artifactId>
+    <version>1.2.7</version>
+</dependency>
+#+END_SRC
+
+add config for this
+#+BEGIN_SRC java
+@Bean
+public SqlSessionFactory sqlSessionFactory() throws Exception {
+    SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+    sessionFactory.setDataSource(datasource());
+
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor() });
+
+    // load xml & handler
+    sessionFactory.setMapperLocations(...);
+    sessionFactory.setTypeHandlers(...);
+    return sessionFactory.getObject();
+}
+#+END_SRC
+
+or use mybatis-config.xml
+#+BEGIN_SRC xml
+<plugins>
+  <!-- support dialect has: h2、sqlite、postgresql、mysql、mariadb、oracle、sqlserver -->
+  <plugin interceptor="com.github.liuanxin.page.PageInterceptor"/>
+
+  <!--
+  <plugin interceptor="com.github.liuanxin.page.PageInterceptor">
+    <property name="dialect" value="sqlserver2012"/>
+  </plugin>
+  -->
+</plugins>
+#+END_SRC
+
+and a new method in Mapper, for example:
+#+BEGIN_SRC java
+List<User> selectByExample(UserExample example, com.github.liuanxin.page.model.PageBounds page);
+#+END_SRC
