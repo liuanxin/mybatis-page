@@ -19,7 +19,16 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(datasource());
 
-    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor() });
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("MySQL") });
+    /*
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("postgresql") });
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("sqlite") });
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("oracle") });
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("h2") });
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("sqlserver2000") });
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("sqlserver") });
+    sessionFactory.setPlugins(new Interceptor[] { new PageInterceptor("sqlserver2012") });
+    */
 
     // load xml & handler
     sessionFactory.setMapperLocations(...);
@@ -31,14 +40,9 @@ public SqlSessionFactory sqlSessionFactory() throws Exception {
 or use mybatis-config.xml
 #+BEGIN_SRC xml
 <plugins>
-  <!-- support dialect has: h2、sqlite、postgresql、mysql、mariadb、oracle、sqlserver -->
-  <plugin interceptor="com.github.liuanxin.page.PageInterceptor"/>
-
-  <!--
   <plugin interceptor="com.github.liuanxin.page.PageInterceptor">
     <property name="dialect" value="sqlserver2012"/>
   </plugin>
-  -->
 </plugins>
 #+END_SRC
 
