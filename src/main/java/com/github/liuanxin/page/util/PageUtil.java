@@ -3,10 +3,7 @@ package com.github.liuanxin.page.util;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.session.Configuration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author https://github.com/liuanxin
@@ -19,27 +16,36 @@ public class PageUtil {
         private BoundSql boundSql;
         BoundSqlSqlSource(MappedStatement ms, Object parameter, String sql,
                           Map<String, Object> pageParams, boolean countQuery) {
+            Configuration config = ms.getConfiguration();
             BoundSql oldBoundSql = ms.getBoundSql(parameter);
             List<ParameterMapping> parameterMappings = oldBoundSql.getParameterMappings();
+            if (parameterMappings == null || parameterMappings.size() == 0) {
+                parameterMappings = new LinkedList<>();
+            }
+            if (!countQuery && pageParams != null && pageParams.size() > 0) {
+                for (Map.Entry<String, Object> entry : pageParams.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
 
-            Configuration config = ms.getConfiguration();
+                    parameterMappings.add(new ParameterMapping.Builder(config, key, value.getClass()).build());
+                }
+            }
+
             boundSql = new BoundSql(config, sql, parameterMappings, parameter);
+
+            if (!countQuery && pageParams != null && pageParams.size() > 0) {
+                for (Map.Entry<String, Object> entry : pageParams.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    boundSql.setAdditionalParameter(key, value);
+                }
+            }
 
             // handler 「There is no getter for property named '__frch_criterion_1'」 Exception
             for (ParameterMapping mapping : parameterMappings) {
                 String property = mapping.getProperty();
                 if (oldBoundSql.hasAdditionalParameter(property)) {
                     boundSql.setAdditionalParameter(property, oldBoundSql.getAdditionalParameter(property));
-                }
-            }
-
-            if (!countQuery && pageParams != null && pageParams.size() > 0) {
-                for (Map.Entry<String, Object> entry : pageParams.entrySet()) {
-                    String key = entry.getKey();
-                    Object value = entry.getValue();
-
-                    boundSql.getParameterMappings().add(new ParameterMapping.Builder(config, key, value.getClass()).build());
-                    boundSql.setAdditionalParameter(key, value);
                 }
             }
         }

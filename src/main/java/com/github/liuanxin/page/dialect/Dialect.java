@@ -14,7 +14,7 @@ public class Dialect {
     private static final String FOR_UPDATE = " FOR UPDATE";
     private static final String GROUP_BY = " GROUP BY ";
 
-    private static final Pattern COUNT_REGEX = Pattern.compile("^SELECT (.*?) FROM ");
+    private static final Pattern COUNT_REGEX = Pattern.compile("(?i)^SELECT (.*?) FROM ");
     // COUNT (*) is the sql specification, it's not slower than COUNT (NUM)
     private static final String COUNT = "SELECT COUNT(*) FROM ";
 
