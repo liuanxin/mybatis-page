@@ -12,10 +12,9 @@ import java.util.regex.Pattern;
 public class Dialect {
 
     private static final String FOR_UPDATE = " FOR UPDATE";
-    private static final String ORDER_BY = " ORDER BY ";
     private static final String GROUP_BY = " GROUP BY ";
 
-    private static final Pattern COUNT_REGEX = Pattern.compile("(?i)SELECT (.*)? FROM ");
+    private static final Pattern COUNT_REGEX = Pattern.compile("^SELECT (.*?) FROM ");
     // COUNT (*) is the sql specification, it's not slower than COUNT (NUM)
     private static final String COUNT = "SELECT COUNT(*) FROM ";
 
@@ -84,9 +83,10 @@ public class Dialect {
             return COUNT + " (" + countSql + ") TEMP_COUNT";
         } else {
             // count sql query don't need <order by xxx>
-            if (upperCase.contains(ORDER_BY)) {
-                countSql = countSql.substring(0, upperCase.indexOf(ORDER_BY));
-            }
+            /*String orderBy = " ORDER BY ";
+            if (upperCase.contains(orderBy)) {
+                countSql = countSql.substring(0, upperCase.indexOf(orderBy));
+            }*/
             return COUNT_REGEX.matcher(countSql).replaceFirst(COUNT);
         }
     }
