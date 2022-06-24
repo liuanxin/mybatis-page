@@ -33,7 +33,7 @@
         <servlet-api.version>4.0.1</servlet-api.version>
 
         <junit.version>4.13.1</junit.version>
-        <mysql.version>8.0.18</mysql.version>
+        <mysql.version>8.0.28</mysql.version>
         <logback.version>1.2.3</logback.version>
     </properties>
 
